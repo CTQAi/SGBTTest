@@ -1,0 +1,2760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Singapore Basic Theory of Driving – Quiz</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      color: #1a202c;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a365d 0%, #2b6cb0 100%);
+      color: #fff;
+      padding: 24px 32px;
+      text-align: center;
+    }
+    header h1 { font-size: 1.7rem; font-weight: 700; letter-spacing: 0.5px; }
+    header p  { margin-top: 6px; font-size: 0.95rem; opacity: 0.85; }
+
+    /* ─── Start / Result screens ─── */
+    #start-screen, #result-screen {
+      max-width: 640px;
+      margin: 60px auto;
+      background: #fff;
+      border-radius: 12px;
+      padding: 40px 36px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.1);
+      text-align: center;
+    }
+    #start-screen h2, #result-screen h2 {
+      font-size: 1.4rem;
+      margin-bottom: 16px;
+      color: #2b6cb0;
+    }
+    #start-screen p { color: #4a5568; line-height: 1.6; margin-bottom: 12px; }
+
+    /* Topic selector */
+    .topic-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    .topic-grid label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #ebf8ff;
+      border: 1px solid #bee3f8;
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      color: #2c5282;
+      transition: background .15s;
+    }
+    .topic-grid label:hover { background: #bee3f8; }
+    .topic-grid input[type=checkbox] { accent-color: #2b6cb0; width: 16px; height: 16px; }
+
+    .count-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .count-row label { font-weight: 600; color: #4a5568; }
+    .count-row select {
+      padding: 6px 12px;
+      border: 1px solid #cbd5e0;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      background: #fff;
+    }
+
+    /* ─── Quiz screen ─── */
+    #quiz-screen { display: none; max-width: 800px; margin: 40px auto; padding: 0 16px 60px; }
+
+    .progress-bar-wrap {
+      background: #e2e8f0;
+      border-radius: 99px;
+      height: 8px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3182ce, #63b3ed);
+      border-radius: 99px;
+      transition: width .3s;
+    }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: #718096;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 32px 36px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.08);
+      margin-bottom: 20px;
+    }
+
+    .topic-badge {
+      display: inline-block;
+      background: #ebf8ff;
+      color: #2b6cb0;
+      border-radius: 99px;
+      padding: 3px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+      letter-spacing: 0.3px;
+    }
+
+    .question-text {
+      font-size: 1.08rem;
+      font-weight: 600;
+      line-height: 1.55;
+      color: #1a202c;
+      margin-bottom: 24px;
+    }
+
+    .options { display: flex; flex-direction: column; gap: 12px; }
+
+    .option-btn {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: #f7fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px 18px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      text-align: left;
+      transition: border-color .15s, background .15s;
+      line-height: 1.5;
+    }
+    .option-btn:hover:not(:disabled) {
+      border-color: #90cdf4;
+      background: #ebf8ff;
+    }
+    .option-btn .letter {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      color: #4a5568;
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .option-btn.correct  { border-color: #48bb78; background: #f0fff4; }
+    .option-btn.correct  .letter { background: #48bb78; color: #fff; }
+    .option-btn.wrong    { border-color: #fc8181; background: #fff5f5; }
+    .option-btn.wrong    .letter { background: #fc8181; color: #fff; }
+    .option-btn.reveal   { border-color: #48bb78; background: #f0fff4; }
+    .option-btn.reveal   .letter { background: #48bb78; color: #fff; }
+    .option-btn:disabled { cursor: default; }
+
+    .explanation {
+      margin-top: 18px;
+      padding: 14px 18px;
+      background: #fffbeb;
+      border-left: 4px solid #f6ad55;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.9rem;
+      color: #744210;
+      line-height: 1.6;
+      display: none;
+    }
+
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .btn {
+      padding: 11px 28px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    .btn:hover { opacity: 0.88; }
+    .btn-primary { background: #2b6cb0; color: #fff; }
+    .btn-outline { background: #fff; color: #2b6cb0; border: 2px solid #2b6cb0; }
+    .btn-danger  { background: #e53e3e; color: #fff; }
+
+    /* ─── Result screen ─── */
+    .score-circle {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      border: 8px solid #2b6cb0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+    .score-circle .pct { font-size: 2rem; font-weight: 700; color: #2b6cb0; }
+    .score-circle .lbl { font-size: 0.75rem; color: #718096; }
+
+    .result-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .stat-box {
+      background: #f7fafc;
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+    }
+    .stat-box .val { font-size: 1.5rem; font-weight: 700; }
+    .stat-box .key { font-size: 0.78rem; color: #718096; margin-top: 4px; }
+    .stat-box.green .val { color: #38a169; }
+    .stat-box.red   .val { color: #e53e3e; }
+    .stat-box.blue  .val { color: #3182ce; }
+
+    .pass-label {
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 10px 24px;
+      border-radius: 99px;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+    .pass-label.pass { background: #c6f6d5; color: #276749; }
+    .pass-label.fail { background: #fed7d7; color: #9b2c2c; }
+
+    #result-screen .btn + .btn { margin-left: 12px; }
+
+    /* Review section */
+    #review-section { max-width: 800px; margin: 0 auto 60px; padding: 0 16px; }
+    #review-section h3 { font-size: 1.1rem; margin-bottom: 16px; color: #2d3748; }
+    .review-item { background: #fff; border-radius: 10px; padding: 20px 24px; margin-bottom: 14px; box-shadow: 0 1px 6px rgba(0,0,0,.07); }
+    .review-item .r-q { font-weight: 600; margin-bottom: 10px; font-size: 0.95rem; }
+    .review-item .r-opt { font-size: 0.88rem; padding: 6px 10px; border-radius: 6px; margin: 3px 0; }
+    .review-item .r-opt.rc { background: #f0fff4; color: #276749; }
+    .review-item .r-opt.rw { background: #fff5f5; color: #9b2c2c; }
+    .review-item .r-exp { font-size: 0.85rem; color: #744210; background: #fffbeb; padding: 10px 12px; border-radius: 6px; margin-top: 8px; }
+
+    @media (max-width: 520px) {
+      .topic-grid { grid-template-columns: 1fr; }
+      .result-stats { grid-template-columns: 1fr 1fr; }
+      .card { padding: 20px 18px; }
+      header h1 { font-size: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Singapore Basic Theory of Driving</h1>
+  <p>Official Handbook (9th Edition) – Multiple Choice Practice Quiz</p>
+</header>
+
+<!-- ═══════════════ START SCREEN ═══════════════ -->
+<div id="start-screen">
+  <h2>Choose Your Quiz</h2>
+  <p>Select the topics you want to practise and how many questions to attempt. Pass mark is <strong>90%</strong> (same as the actual BTT).</p>
+
+  <div style="margin: 20px 0 10px; text-align:left; font-weight:600; color:#4a5568;">Topics</div>
+  <div class="topic-grid" id="topic-grid"></div>
+
+  <div class="count-row" style="margin-top:20px;">
+    <label for="q-count">Number of questions:</label>
+    <select id="q-count">
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="30" selected>30</option>
+      <option value="50">50</option>
+      <option value="all">All</option>
+    </select>
+  </div>
+
+  <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+
+  <!-- Resume banner (shown only when saved progress exists) -->
+  <div id="resume-banner" style="display:none; margin-top:20px; padding:16px 20px; background:#ebf8ff; border:1px solid #bee3f8; border-radius:10px; text-align:left;">
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+      <div>
+        <div style="font-weight:700; color:#2b6cb0; margin-bottom:4px;">&#128190; Saved session found</div>
+        <div id="resume-info" style="font-size:0.88rem; color:#4a5568;"></div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-primary" onclick="resumeQuiz()" style="padding:8px 18px; font-size:0.9rem;">Resume</button>
+        <button class="btn btn-outline" onclick="discardSave()" style="padding:8px 14px; font-size:0.9rem;">Discard</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ QUIZ SCREEN ═══════════════ -->
+<div id="quiz-screen">
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-fill"></div></div>
+  <div class="progress-label">
+    <span id="prog-text">Question 1 of 30</span>
+    <span id="score-live">Score: 0 / 0</span>
+  </div>
+
+  <div class="card" id="q-card">
+    <div class="topic-badge" id="q-topic"></div>
+    <div id="q-image" style="text-align:center;margin:0 0 18px;"></div>
+    <div class="question-text" id="q-text"></div>
+    <div class="options" id="q-options"></div>
+    <div class="explanation" id="q-explanation"></div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-outline" onclick="endQuiz()">End Quiz</button>
+    <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" style="display:none;">Next Question</button>
+  </div>
+</div>
+
+<!-- ═══════════════ RESULT SCREEN ═══════════════ -->
+<div id="result-screen" style="display:none;">
+  <h2>Quiz Complete!</h2>
+  <div class="score-circle">
+    <span class="pct" id="res-pct"></span>
+    <span class="lbl">Score</span>
+  </div>
+  <span class="pass-label" id="res-pass"></span>
+  <div class="result-stats">
+    <div class="stat-box green"><div class="val" id="res-correct"></div><div class="key">Correct</div></div>
+    <div class="stat-box red">  <div class="val" id="res-wrong"></div>  <div class="key">Wrong</div></div>
+    <div class="stat-box blue"> <div class="val" id="res-total"></div>  <div class="key">Total</div></div>
+  </div>
+  <button class="btn btn-primary" onclick="startNew()">New Quiz</button>
+  <button class="btn btn-outline" onclick="showReview()">Review Answers</button>
+</div>
+
+<div id="review-section" style="display:none;">
+  <h3>Answer Review</h3>
+  <div id="review-list"></div>
+  <button class="btn btn-outline" onclick="hideReview()" style="margin-top:8px;">Hide Review</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  QUESTION BANK  (sourced from BT ENG 9th Edition 130717.pdf)
+// ═══════════════════════════════════════════════════════════════
+const QUESTIONS = [
+
+  // ─── PART I: DRIVING LICENCES ───────────────────────────────
+  {
+    topic: "Part I – Driving Licences",
+    q: "What is the minimum age to apply for a Class 3 (manual) car driving licence in Singapore?",
+    opts: ["16 years old", "17 years old", "18 years old", "21 years old"],
+    ans: 2,
+    exp: "An applicant must be at least 18 years old to qualify for a Class 3 driving licence."
+  },
+  {
+    topic: "Part I – Driving Licences",
+    q: "A Class 2B licence covers motorcycles with engine capacity not exceeding:",
+    opts: ["150 cc", "200 cc", "400 cc", "650 cc"],
+    ans: 1,
+    exp: "Class 2B covers motorcycles with engine capacity not exceeding 200 cc, or electric motorcycles."
+  },
+  {
+    topic: "Part I – Driving Licences",
+    q: "A Class 2A licence covers motorcycles with engine capacity between:",
+    opts: ["100 cc and 200 cc", "201 cc and 400 cc", "401 cc and 650 cc", "201 cc and 650 cc"],
+    ans: 1,
+    exp: "Class 2A covers motorcycles with engine capacity between 201 cc and 400 cc."
+  },
+  {
+    topic: "Part I – Driving Licences",
+    q: "For how long is a driving licence valid for a Singapore Citizen or Permanent Resident?",
+    opts: ["10 years", "Until age 65", "Lifetime", "5 years"],
+    ans: 2,
+    exp: "For Singapore Citizens and Permanent Residents, the driving licence is valid for their lifetime."
+  },
+  {
+    topic: "Part I – Driving Licences",
+    q: "For foreigners holding a work pass, their Singapore driving licence is valid for a maximum of:",
+    opts: ["1 year", "3 years", "5 years", "10 years"],
+    ans: 2,
+    exp: "For foreigners with a work pass, the driving licence is valid for up to 5 years."
+  },
+  {
+    topic: "Part I – Driving Licences",
+    q: "A new driver is under probation for how long from the date the new class of licence is granted?",
+    opts: ["6 months", "1 year", "2 years", "3 years"],
+    ans: 1,
+    exp: "New drivers are under probation for one year from the date of grant of the new driving licence."
+  },
+  {
+    topic: "Part I – Driving Licences",
+    q: "Under DIPS, a probationary motorist's licence is revoked when they accumulate how many demerit points?",
+    opts: ["8 or more", "12 or more", "13 or more", "24 or more"],
+    ans: 2,
+    exp: "A probationary motorist's new licence is revoked when they accumulate 13 or more demerit points."
+  },
+  {
+    topic: "Part I – Driving Licences",
+    q: "For a non-probationary motorist with no previous suspension, a 1st suspension is triggered when they accumulate how many demerit points within 24 consecutive months?",
+    opts: ["12 or more", "18 or more", "24 or more", "36 or more"],
+    ans: 2,
+    exp: "A 1st suspension occurs when a non-probationary motorist accumulates 24 or more demerit points within 24 consecutive months."
+  },
+  {
+    topic: "Part I – Driving Licences",
+    q: "The 1st suspension period under DIPS is:",
+    opts: ["4 weeks", "8 weeks", "12 weeks", "24 weeks"],
+    ans: 2,
+    exp: "The 1st suspension is for a period of 12 weeks."
+  },
+  {
+    topic: "Part I – Driving Licences",
+    q: "Medical examination is required by law for Class 3 licence holders starting at what age?",
+    opts: ["55 years", "60 years", "65 years", "70 years"],
+    ans: 2,
+    exp: "Class 3 licence holders must undergo a medical examination when they reach 65 years old, then every 3 years."
+  },
+  {
+    topic: "Part I – Driving Licences",
+    q: "A driver failing to wear a seat belt is awarded how many demerit points?",
+    opts: ["1", "2", "3", "4"],
+    ans: 2,
+    exp: "Failing to wear a seat belt attracts 3 demerit points and a composition fine of $120."
+  },
+  {
+    topic: "Part I – Driving Licences",
+    q: "The BTT candidate must be able to read a series of letters and figures at a distance of:",
+    opts: ["10 metres", "20 metres", "25 metres", "30 metres"],
+    ans: 2,
+    exp: "The applicant must read 6 letters and figures in white on black at a distance of 25 metres."
+  },
+  {
+    topic: "Part I – Driving Licences",
+    q: "Exceeding the speed limit by 21 to 30 km/h attracts how many demerit points?",
+    opts: ["3", "4", "6", "8"],
+    ans: 2,
+    exp: "Exceeding the speed limit by 21 to 30 km/h attracts 6 demerit points."
+  },
+  {
+    topic: "Part I – Driving Licences",
+    q: "After passing the BTT, a motorcar (Class 3) candidate must also pass the FTT before taking which test?",
+    opts: ["Riding Theory Test", "Practical Driving Test", "Road Safety Test", "Advanced Driving Test"],
+    ans: 1,
+    exp: "After passing the BTT, Class 3/3A candidates must pass the Final Theory Test (FTT) before the Practical Driving Test."
+  },
+
+  // ─── PART II: SIGNS & SIGNALS ────────────────────────────────
+  {
+    topic: "Part II – Signs & Signals",
+    q: "Mandatory signs are compulsory. What is true about them?",
+    opts: ["They are advisory only", "It is an offence to disobey them", "They only apply to lorries", "They apply at night only"],
+    ans: 1,
+    exp: "Mandatory signs are compulsory – it is an offence to disobey them."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "What should you do at a 'Give Way' sign?",
+    opts: ["Stop completely for 5 seconds", "Slow down, stop if necessary, give way to traffic on major road", "Proceed without stopping", "Sound your horn before proceeding"],
+    ans: 1,
+    exp: "At a 'Give Way' sign, slow down and stop if necessary, then give way to traffic on the major road."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "A 'Stop' sign requires you to:",
+    opts: ["Slow down and yield", "Stop before the white line and give way to traffic from right and left", "Flash your headlights", "Proceed when road seems clear without stopping"],
+    ans: 1,
+    exp: "At a 'Stop' sign, stop before the white line and give way to all traffic from the right and left."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "What does a RED traffic light mean?",
+    opts: ["Proceed with caution", "Stop", "Slow down", "Give way to pedestrians only"],
+    ans: 1,
+    exp: "RED means 'STOP'."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "What does an AMBER traffic light mean?",
+    opts: ["Go faster before the light changes", "Stop unless you are so close to the stop-line that you cannot stop safely", "Give way to vehicles from the right", "Proceed normally"],
+    ans: 1,
+    exp: "AMBER means 'STOP' unless you are so close to the stop-line that you cannot stop safely."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "A FLASHING AMBER traffic light means:",
+    opts: ["The light is about to turn green", "Traffic signals are out of order – proceed with caution, give way to traffic on the right", "All traffic must stop", "Emergency vehicles are approaching"],
+    ans: 1,
+    exp: "Flashing amber means the traffic light signals are out of order. Proceed with caution and give way to traffic on the right."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "A GREEN ARROW traffic light means:",
+    opts: ["Go in any direction", "Go only in the direction indicated after ensuring oncoming traffic is clear", "Stop and wait", "U-turn is permitted"],
+    ans: 1,
+    exp: "A green arrow means 'GO' but only in the direction indicated after ensuring oncoming traffic is clear."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "Signals given by a Police Officer directing traffic take precedence over:",
+    opts: ["Road signs only", "Traffic light signals only", "Road signs, traffic lights, road markings and traffic regulations", "Nothing – they are advisory only"],
+    ans: 2,
+    exp: "Police Officer signals take precedence over road signs, traffic light signals, road markings and traffic regulations."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "A continuous yellow line along the road indicates no parking between:",
+    opts: ["7.00am and 10.00pm", "7.00am and 7.00pm, except on Sundays and public holidays", "7.30am and 9.30pm daily", "6.00am and 11.00pm including weekends"],
+    ans: 1,
+    exp: "A continuous yellow line means no parking from 7.00am to 7.00pm, except on Sundays and public holidays."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "Double yellow zig-zag lines mean:",
+    opts: ["No parking at all times", "No stopping at all times on that side of the road", "No overtaking allowed", "Pedestrian crossing ahead"],
+    ans: 1,
+    exp: "Double yellow zig-zag lines indicate No Stopping at all times on that side of the road where the lines are drawn."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "A single yellow zig-zag line means:",
+    opts: ["No stopping at all times", "No parking at all times except for immediate pick-up/drop-off of passengers", "No overtaking", "Bus lane ahead"],
+    ans: 1,
+    exp: "A single yellow zig-zag line means No Parking at all times, except for immediate pick-up and drop-off of passengers."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "Parallel broken white lines across the road indicate that traffic approaching must:",
+    opts: ["Stop completely", "Give way to traffic on the major road", "Sound the horn", "Keep to the right"],
+    ans: 1,
+    exp: "Parallel broken white lines (give way markings) require traffic approaching to give way to traffic on the major road."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "Vehicles may NOT cross parallel continuous white lines in the centre of the road EXCEPT:",
+    opts: ["When turning right at a junction", "Never – they must not be crossed at all", "When the road is clear ahead", "When overtaking a slow vehicle"],
+    ans: 1,
+    exp: "Vehicles are not allowed to cross parallel continuous white lines. Making a U-turn or right turn at these lines is also not allowed."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "Warning signs require you to:",
+    opts: ["Stop immediately", "Take extra care and slow down as you approach them", "Sound your horn", "Switch on hazard lights"],
+    ans: 1,
+    exp: "Warning signs require road users to take extra care and slow down as they approach these signs."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "The 'Left Turn on Red' sign at a junction requires you to:",
+    opts: ["Turn left freely on red", "Stop at the red light, give way to pedestrians and approaching traffic from the right, then proceed when clear", "Ignore the red light and turn", "Only turn left when the light turns green"],
+    ans: 1,
+    exp: "Left Turn on Red: stop at red, give way to crossing pedestrians and traffic from the right, then proceed only when clear and safe."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "On a EMAS (Expressway Monitoring & Advisory System) sign, a RED CROSS overhead means:",
+    opts: ["Caution – slow down", "The lane is open with possible obstruction ahead", "The lane is closed to traffic", "Emergency vehicle ahead"],
+    ans: 2,
+    exp: "A RED Cross on an EMAS Lane Use Sign indicates that the lane is closed to traffic."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "A normal bus lane may NOT be used by other vehicles (except buses, bicycles, emergency and police vehicles) during which hours on weekdays?",
+    opts: ["7.00am–9.00am and 6.00pm–9.00pm", "7.30am–9.30am and 5.00pm–8.00pm", "8.00am–10.00am and 4.00pm–7.00pm", "6.30am–9.00am and 5.00pm–9.00pm"],
+    ans: 1,
+    exp: "Normal bus lane hours are Mondays to Fridays: 7.30am–9.30am and 5.00pm–8.00pm, except Saturdays, Sundays & Public Holidays."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "Directional signs along expressways typically have:",
+    opts: ["Black letters on white background", "White letters on blue background", "Yellow or white letters on green background", "Red letters on white background"],
+    ans: 2,
+    exp: "Expressway directional signs have yellow letters on green backgrounds (older) or white lettering on green with blue expressway name boxes."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "Long vehicles (goods vehicles >10m) must display at least how many yellow reflective markings on each side?",
+    opts: ["1", "2", "3", "4"],
+    ans: 2,
+    exp: "Long vehicles must display at least 3 yellow reflective markings on each side and at least 1 red reflective marking at the rear."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "Hand signals must be given before:",
+    opts: ["Refuelling only", "Turning/moving right or left, stopping/slowing, pulling out from parking, or pulling out to pass", "Parking only", "Overtaking on the left only"],
+    ans: 1,
+    exp: "Clear hand signals must be given before turning/moving right or left, stopping/slowing down, pulling out from a parking place, or pulling out to pass."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "Parking lots demarcated in RED in a car park are reserved for:",
+    opts: ["Disabled drivers", "Season parking ticket holders", "Short-term visitors", "Motorcycles only"],
+    ans: 1,
+    exp: "Red-demarcated lots are reserved for Season Parking Ticket Holders."
+  },
+  {
+    topic: "Part II – Signs & Signals",
+    q: "A 'Pedestrian signal – Green Man flickering' means:",
+    opts: ["You may cross freely", "Do not start to cross; if already crossing, complete quickly", "Vehicles must stop", "Pedestrians must use an underpass"],
+    ans: 1,
+    exp: "A flickering Green Man means do not start crossing; if already crossing, complete your crossing as quickly as possible."
+  },
+
+  // ─── TRAFFIC SIGNS (dedicated topic) ────────────────────────
+  {
+    topic: "Traffic Signs",
+    q: "What colour background do MANDATORY signs use in Singapore?",
+    opts: ["Red background with white symbols", "Blue background with white symbols", "White background with red border", "Green background with white symbols"],
+    ans: 1,
+    exp: "Mandatory signs in Singapore have a blue background with white symbols/arrows. They are compulsory and it is an offence to disobey them."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "The 'Turn Right Only' sign belongs to which category?",
+    opts: ["Warning signs", "Prohibitory signs", "Mandatory signs", "Regulatory signs"],
+    ans: 2,
+    exp: "'Turn Right Only' is a mandatory sign – you MUST turn right at that point. It is compulsory and disobeying it is an offence."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "The 'No Entry for All Vehicles' sign is classified as:",
+    opts: ["Warning sign", "Mandatory sign", "Prohibitory sign", "Information sign"],
+    ans: 2,
+    exp: "'No Entry for All Vehicles' is a prohibitory sign. Failure to comply constitutes an offence."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "What shape are WARNING signs typically?",
+    opts: ["Circular with red border", "Rectangular green", "Triangular with red border or diamond-shaped", "Octagonal red"],
+    ans: 2,
+    exp: "Warning signs in Singapore are typically triangular with a red border (or diamond-shaped), alerting road users to hazards ahead."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "A 'Right Bend' warning sign means you should:",
+    opts: ["Turn right immediately", "Slow down, keep left, do not overtake, make a U-turn or park your vehicle", "Stop and give way", "Sound your horn before proceeding"],
+    ans: 1,
+    exp: "A Right Bend warning sign means: slow down, keep left, do not overtake, make a U-turn, or park your vehicle."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "A 'Cross Junction' warning sign means you should:",
+    opts: ["Stop completely", "Slow down and beware of traffic approaching the junction", "Give way to traffic from the right only", "Sound horn before crossing"],
+    ans: 1,
+    exp: "A Cross Junction sign means slow down and beware of traffic approaching the junction from all directions."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "A 'T-Junction' warning sign tells you to:",
+    opts: ["Stop and give way to all traffic", "Slow down and give way to traffic from the right and left", "Keep right", "Turn left only"],
+    ans: 1,
+    exp: "A T-Junction warning sign means slow down and give way to traffic from the right and left."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "What does the 'Pedestrian Crossing Ahead' warning sign require you to do?",
+    opts: ["Speed up to clear the crossing quickly", "Slow down and stop for pedestrians to cross at the designated crossing", "Sound horn to warn pedestrians", "No action needed"],
+    ans: 1,
+    exp: "The Pedestrian Crossing Ahead warning sign requires you to slow down and stop for pedestrians to cross at the designated crossing."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "The 'Roundabout' warning sign requires you to:",
+    opts: ["Proceed straight without slowing", "Slow down, stop if necessary, give way to traffic on the right", "Sound horn before entering", "Give way to traffic on the left"],
+    ans: 1,
+    exp: "The Roundabout warning sign means slow down, stop if necessary, and give way to traffic on the right."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "A 'Steep Downward Slope' warning sign requires you to:",
+    opts: ["Accelerate to maintain momentum", "Keep left, change to a lower gear, do not overtake, make a U-turn or park", "Sound horn continuously", "Switch to neutral gear"],
+    ans: 1,
+    exp: "A Steep Downward Slope sign means: keep left, change to a lower gear, do not overtake, make a U-turn, or park your vehicle."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "A 'Slippery Road' warning sign means you should:",
+    opts: ["Stop and wait for conditions to improve", "Slow down and drive carefully", "Switch to 4WD immediately", "Honk to warn other drivers"],
+    ans: 1,
+    exp: "A Slippery Road sign means slow down and drive carefully."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "What does the 'Road Narrows on One Side' warning sign require?",
+    opts: ["Stop and wait", "Slow down, do not overtake, make a U-turn or park your vehicle", "Move to the right lane", "Sound horn"],
+    ans: 1,
+    exp: "Road Narrows on One Side: slow down and do not overtake, make a U-turn, or park your vehicle."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "A 'Light Signals Ahead' warning sign means:",
+    opts: ["Traffic lights are not working", "Slow down and beware of traffic lights changing", "Proceed at normal speed", "Pedestrians have right of way"],
+    ans: 1,
+    exp: "A Light Signals Ahead warning sign means slow down and beware of traffic lights changing."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "The 'Road Leading to Quay, River Bank or Sea' warning sign means:",
+    opts: ["Ferry terminal ahead", "Slow down and beware of the road ending ahead", "No entry for heavy vehicles", "U-turn available ahead"],
+    ans: 1,
+    exp: "This warning sign means slow down and beware of the road ending ahead (at a quay, river bank, or sea)."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "A 'No Stopping' prohibitory sign means:",
+    opts: ["No parking at all times but can stop briefly", "Vehicles cannot stop at all on that road section", "No parking during stated hours", "No waiting except to pick up passengers"],
+    ans: 1,
+    exp: "'No Stopping' means vehicles cannot stop at all on that section of road."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "A 'No Waiting' prohibitory sign allows vehicles to:",
+    opts: ["Not stop at all", "Stop only to allow passengers to board or alight", "Park for up to 30 minutes", "Stop only during off-peak hours"],
+    ans: 1,
+    exp: "'No Waiting' means vehicles may stop only to allow boarding or alighting of passengers; they cannot wait/park."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "The 'Width Limit' prohibitory sign (showing 2.3m) prohibits entry of vehicles with width:",
+    opts: ["Exceeding 2.0 m", "Exceeding 2.3 m", "Exceeding 3.0 m", "Exceeding 4.5 m"],
+    ans: 1,
+    exp: "The Width Limit sign (default 2.3 m) prohibits entry of vehicles with width in excess of the stated limit."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "The 'Height Limit' sign (default 4.5 m) prohibits entry of vehicles with overall height:",
+    opts: ["Exceeding 3.5 m", "Exceeding 4.0 m", "Exceeding 4.5 m", "Exceeding 5.0 m"],
+    ans: 2,
+    exp: "The default Height Limit sign prohibits entry of vehicles with overall height exceeding 4.5 m. Police escort is required for taller vehicles."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "Driving a vehicle with overall height exceeding 4.5 m without police escort is:",
+    opts: ["Allowed on expressways only", "Committing an offence", "Permitted during off-peak hours", "Allowed with a special permit sticker"],
+    ans: 1,
+    exp: "Driving a vehicle with overall height exceeding 4.5 m without police escort is committing an offence."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "The 'No Overtaking' prohibitory sign means:",
+    opts: ["No overtaking of motorcycles only", "No overtaking at all on that road section", "No overtaking heavy vehicles only", "No overtaking between stated hours"],
+    ans: 1,
+    exp: "'No Overtaking' is a prohibitory sign that forbids all overtaking on that road section."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "An 'Electronic Road Pricing (ERP) Zone Ahead' warning sign tells motorists:",
+    opts: ["Toll booth ahead – stop and pay", "Pay a road user charge when entering the zone during restricted hours", "No entry for private cars", "Speed camera ahead"],
+    ans: 1,
+    exp: "The ERP Zone Ahead warning sign means you will pay a road user charge when entering the zone during restricted hours."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "What does the 'U-Turn Ahead (from opposite direction)' warning sign mean?",
+    opts: ["You may make a U-turn here", "Beware of U-turning vehicles coming from the opposite direction", "U-turn is prohibited ahead", "One-way road ahead"],
+    ans: 1,
+    exp: "This sign warns drivers to beware of vehicles making U-turns from the opposite direction."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "The 'Start of School Zone' sign requires drivers to:",
+    opts: ["Stop completely until a warden signals", "Slow down and look out for children walking or crossing the road", "Sound horn to warn children", "Use hazard lights"],
+    ans: 1,
+    exp: "The Start of School Zone sign means slow down and look out for children walking or crossing the road."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "The 'Expressway Ahead' information sign indicates that:",
+    opts: ["All vehicles must use the expressway", "Certain types of vehicles are prohibited from using the expressway", "No speed limit applies ahead", "Toll booth is ahead"],
+    ans: 1,
+    exp: "The Expressway Ahead sign informs motorists that certain types of vehicles are prohibited from using the expressway."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "A 'Bus Lane' information sign means vehicles other than buses:",
+    opts: ["May use the lane at any time", "Are not allowed to use the lane during restricted hours", "Must use the lane to allow buses to overtake", "Can use it only on weekends"],
+    ans: 1,
+    exp: "The Bus Lane sign means vehicles other than omnibuses, bicycles, emergency and police vehicles are not allowed to use the lane during restricted hours."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "A 'Red Light Camera Ahead' information sign means:",
+    opts: ["Slow down and get ready to stop when signals change to amber", "The signal is always red at this junction", "Stop immediately", "No right turn ahead"],
+    ans: 0,
+    exp: "A Red Light Camera Ahead sign means: get ready to stop when the signals change to amber, as a camera enforces red light compliance."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "A 'Bus Stop' information sign means no parking or stopping within how many metres of the bus stop?",
+    opts: ["6 metres", "9 metres", "12 metres", "15 metres"],
+    ans: 1,
+    exp: "No parking or stopping within 9 metres of a bus stop (from the edge of a yellow demarcated box or tip of a bus bay)."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "A 'Mandatory Give-Way to Buses' sign requires you to:",
+    opts: ["Stop at all times when a bus is visible", "Slow down at the first Give-Way Triangle, watch for buses exiting bays, and give way before the give-way lines", "Sound horn to alert the bus driver", "Use the left lane only"],
+    ans: 1,
+    exp: "Slow down at the first Give-Way Triangle road marking, watch for buses exiting the bay, stop before the Give-Way lines, and give way to buses leaving the bus bay. Do not stop in the yellow Give-Way Bus Box."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "The 'Vehicle Breakdown' warning sign should be placed at least how far from the rear of the vehicle?",
+    opts: ["5 metres", "10 metres", "15 metres", "20 metres"],
+    ans: 3,
+    exp: "The vehicle breakdown warning triangle must be placed at least 20 metres from the rear of the broken-down vehicle."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "Regulatory signs are used to:",
+    opts: ["Warn of hazards ahead", "Regulate the movements of traffic", "Provide tourist information", "Show distance to destinations"],
+    ans: 1,
+    exp: "Regulatory signs regulate the movements of traffic (e.g. slow down, detour, sharp deviation, barrier signs)."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "A 'No Through Road' information sign (road on the right does not lead to another road) tells you:",
+    opts: ["The road is closed for repairs", "The road on the right is a dead-end and does not lead to another road", "No vehicles are permitted on the right road", "Only buses may use the right road"],
+    ans: 1,
+    exp: "'No Through Road' means the road on the right does not lead to another road – it is a dead end."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "The 'Tunnel Ahead' sign means:",
+    opts: ["No entry for motorcycles", "The stretch of road ahead is in a tunnel – prepare by switching on headlights and radio", "A toll booth is ahead", "Road narrows ahead"],
+    ans: 1,
+    exp: "The Tunnel Ahead sign means the stretch of road ahead is in a tunnel. Switch on headlights and turn on the radio for emergency broadcasts."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "The 'No Entry for Bicycles' sign prohibits:",
+    opts: ["Motorcycles only", "Pedal cycles (e.g. bicycles, tricycles, trishaws) beyond the sign", "All two-wheeled vehicles", "Electric scooters only"],
+    ans: 1,
+    exp: "The 'No Entry for Bicycles' sign prohibits the riding of pedal cycles (trishaws, tricycles and bicycles) beyond the point marked by the sign."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "What does the GREEN DOWN ARROW on a tunnel Lane Use Sign indicate?",
+    opts: ["Proceed with caution as there may be an obstruction", "The lane is closed", "The lane is open for use", "Reduce speed and merge left"],
+    ans: 2,
+    exp: "A green down arrow on a tunnel Lane Use Sign indicates that the lane is open for use."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "A FLASHING AMBER CROSS on a tunnel Lane Use Sign means:",
+    opts: ["The lane is closed", "The lane is open but there may be an obstruction ahead – slow down and be prepared to change lane", "Proceed at normal speed", "Emergency services are ahead"],
+    ans: 1,
+    exp: "A flashing amber cross means the lane is still open but there may be an obstruction ahead. Drivers must slow down and be prepared to change lane."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "Information signs provide useful information to motorists. What colour background do they typically use?",
+    opts: ["Red", "Blue", "Green", "Yellow"],
+    ans: 2,
+    exp: "Information signs typically have a green background with white lettering, providing useful guidance such as bus stops, taxi stands, expressway entrances, etc."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "Confirmation Directional Signs can be identified by:",
+    opts: ["A round shape", "A chevron shape on one end indicating direction", "A red border", "Flashing lights"],
+    ans: 1,
+    exp: "Confirmation Directional Signs have a chevron shape on one end to indicate the direction of travel."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "The 'Uneven Road' warning sign requires you to:",
+    opts: ["Stop and check the road surface", "Slow down, keep left, do not overtake", "Sound horn", "Use hazard lights"],
+    ans: 1,
+    exp: "An Uneven Road warning sign means slow down, keep left, and do not overtake."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "The 'Road Hump Ahead' warning sign requires you to:",
+    opts: ["Stop before the hump", "Slow down, keep left, do not overtake", "Sound horn before crossing the hump", "Change to a lower gear and accelerate"],
+    ans: 1,
+    exp: "Road Hump Ahead: slow down, keep left, and do not overtake."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "The 'White Walking Sticks' information sign means:",
+    opts: ["Senior citizen crossing nearby", "Slow down and stop if necessary to give way to blind people crossing", "No pedestrians allowed", "Pedestrian underpass ahead"],
+    ans: 1,
+    exp: "The White Walking Sticks sign means slow down and stop if necessary to give way to blind people crossing the road."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "What does a 'Speed Limit 70' prohibitory sign mean?",
+    opts: ["Minimum speed is 70 km/h", "Recommended speed is 70 km/h", "Do not exceed 70 km/h", "Speed limit applies only to heavy vehicles"],
+    ans: 2,
+    exp: "A Speed Limit sign is a prohibitory sign meaning do not exceed the stated speed (70 km/h in this case)."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "A 'Sharp Deviation' regulatory sign requires you to:",
+    opts: ["Stop and reverse", "Slow down and drive in the direction indicated", "Overtake the vehicle ahead", "Make a U-turn"],
+    ans: 1,
+    exp: "A Sharp Deviation sign means slow down and drive in the direction indicated."
+  },
+  {
+    topic: "Traffic Signs",
+    q: "Curve Alignment Markers on the road are used to:",
+    opts: ["Mark the edge of expressways", "Guide drivers to slow down and drive carefully at bends", "Indicate bus stops", "Show school zone boundaries"],
+    ans: 1,
+    exp: "Curve Alignment Markers are placed at bends to guide motorists to slow down and drive carefully."
+  },
+
+  // ─── PART III: TRAFFIC RULES & REGULATIONS ───────────────────
+  {
+    topic: "Part III – Traffic Rules & Regulations",
+    q: "Unless otherwise stated, the speed limit on all roads in Singapore is:",
+    opts: ["40 km/h", "50 km/h", "60 km/h", "70 km/h"],
+    ans: 1,
+    exp: "Unless otherwise stated, the speed limit of all roads in Singapore is 50 km/h."
+  },
+  {
+    topic: "Part III – Traffic Rules & Regulations",
+    q: "The Keep-Left rule requires you to:",
+    opts: ["Always drive in the left lane regardless of speed", "Keep well to the left except when overtaking or turning right", "Only use the left lane on expressways", "Overtake on the left at all times"],
+    ans: 1,
+    exp: "Keep well to the left and near the boundary of the road, except when you intend to overtake or turn right."
+  },
+  {
+    topic: "Part III – Traffic Rules & Regulations",
+    q: "You may overtake on the LEFT when:",
+    opts: ["The vehicle in front is slow", "The driver in front has signalled to turn right, or you want to turn left, or traffic is moving slowly in queues with right lanes slower", "Whenever there is space on the left", "At all times on dual-carriageways"],
+    ans: 1,
+    exp: "Overtaking on the left is allowed when the driver in front signals to turn right, when you want to turn left at a junction, when right lanes are moving slower in queues, or on one-way streets."
+  },
+  {
+    topic: "Part III – Traffic Rules & Regulations",
+    q: "You must NOT overtake when approaching or at which location?",
+    opts: ["A petrol station", "A pedestrian crossing, road junction, corner/bend, brow of a hill, or double white lines", "A bus stop", "A zebra crossing only"],
+    ans: 1,
+    exp: "Do not overtake at a pedestrian crossing, road junction, corner or bend, the brow of a hill, or at double white lines."
+  },
+  {
+    topic: "Part III – Traffic Rules & Regulations",
+    q: "When approaching a roundabout, you must give way to traffic:",
+    opts: ["On your left", "On your right", "Already in the roundabout from all directions", "Exiting the roundabout"],
+    ans: 1,
+    exp: "At a roundabout, slow down and give way to traffic approaching from your right."
+  },
+  {
+    topic: "Part III – Traffic Rules & Regulations",
+    q: "It is an offence to drive into a yellow-box junction when:",
+    opts: ["You are turning right only", "The lights are green but traffic has come to a standstill causing obstruction", "It is raining", "You are a new driver"],
+    ans: 1,
+    exp: "It is an offence to drive into a yellow-box junction and cause obstruction, even if the lights are in your favour."
+  },
+  {
+    topic: "Part III – Traffic Rules & Regulations",
+    q: "Where should you NOT park? (Select the rule that applies)",
+    opts: ["At a bend, brow of a hill, or bridge", "More than 6 metres from a junction", "More than 9 metres from a bus stop", "On a well-lit one-way road"],
+    ans: 0,
+    exp: "You must not park at a bend, the brow of a hill, or a bridge. Parking must also be avoided within 6 metres of a junction and 9 metres of a bus stop."
+  },
+  {
+    topic: "Part III – Traffic Rules & Regulations",
+    q: "When should you drive with headlights ON at night?",
+    opts: ["Only in the rain", "Between 7.00pm and 7.00am", "Only on expressways", "When visibility drops below 50 metres"],
+    ans: 1,
+    exp: "You must drive with headlights on at night, which is between 7.00pm and 7.00am."
+  },
+  {
+    topic: "Part III – Traffic Rules & Regulations",
+    q: "What is the penalty for using a mobile phone while driving?",
+    opts: ["A $200 fine only", "Fine not exceeding $1,000 or imprisonment not exceeding 6 months, or both, and possible licence disqualification", "3 demerit points only", "$500 fine and 3 demerit points"],
+    ans: 1,
+    exp: "Using a mobile phone while driving: fine not exceeding $1,000 or imprisonment up to 6 months, or both. Licence is also likely to be disqualified."
+  },
+  {
+    topic: "Part III – Traffic Rules & Regulations",
+    q: "Do not make a U-turn except:",
+    opts: ["At any junction", "Where a U-turn sign is located", "On any two-way road", "In any residential area"],
+    ans: 1,
+    exp: "Do not make a U-turn at any road intersection, junction or road divider opening except where a U-turn sign is located."
+  },
+  {
+    topic: "Part III – Traffic Rules & Regulations",
+    q: "At an uncontrolled junction (no signs or lights), if you are going straight across, you must give way to traffic:",
+    opts: ["Coming from the right only", "Coming from the left only", "Approaching from all directions", "No one – you have right of way"],
+    ans: 2,
+    exp: "At an uncontrolled junction going straight, give way to traffic approaching from all directions."
+  },
+  {
+    topic: "Part III – Traffic Rules & Regulations",
+    q: "The composition fine for failing to belt up is:",
+    opts: ["$50 and 1 demerit point", "$80 and 2 demerit points", "$120 and 3 demerit points", "$200 and 4 demerit points"],
+    ans: 2,
+    exp: "Failing to wear a seat belt carries a composition fine of $120 and 3 demerit points."
+  },
+  {
+    topic: "Part III – Traffic Rules & Regulations",
+    q: "Road-Hogging means driving at an unreasonably slow speed, especially on which part of the road?",
+    opts: ["The left lane", "The right-hand lane or along the centre", "The bus lane", "The shoulder of the road"],
+    ans: 1,
+    exp: "Road-Hogging is driving at an unreasonably slow speed especially on the right-hand lane or along the centre of the road."
+  },
+  {
+    topic: "Part III – Traffic Rules & Regulations",
+    q: "When turning right into a two-way street, you should turn into:",
+    opts: ["The extreme right lane", "The lane just left of the centre line of the road you are turning into", "Any available lane", "The bus lane"],
+    ans: 1,
+    exp: "When turning right into a two-way street, turn into the lane just left of the centre line of the road you are turning into."
+  },
+  {
+    topic: "Part III – Traffic Rules & Regulations",
+    q: "Minimum age for riding a motorised (power-assisted) bicycle is:",
+    opts: ["14 years old", "15 years old", "16 years old", "18 years old"],
+    ans: 2,
+    exp: "The minimum age for motorised (power-assisted) bicycle cycling is 16 years old."
+  },
+
+  // ─── PART IV: CODE OF CONDUCT ─────────────────────────────────
+  {
+    topic: "Part IV – Code of Conduct",
+    q: "The 'Two-Second Rule' is used to:",
+    opts: ["Time traffic light changes", "Ensure a safe following gap between your vehicle and the vehicle in front", "Measure safe overtaking distance", "Calculate stopping distance on wet roads"],
+    ans: 1,
+    exp: "The Two-Second Rule ensures a safe gap: count 'one-thousand-and-one, one-thousand-and-two' after the car in front passes a fixed point. If you reach the same spot before finishing, you are too close."
+  },
+  {
+    topic: "Part IV – Code of Conduct",
+    q: "You should allow at least one car length for every how many km/h of your speed, to maintain a safe following distance?",
+    opts: ["8 km/h", "12 km/h", "16 km/h", "24 km/h"],
+    ans: 2,
+    exp: "Allow at least one car length for every 16 km/h of your speed as a safe following distance."
+  },
+  {
+    topic: "Part IV – Code of Conduct",
+    q: "At 50 km/h on a dry road, what is the approximate total stopping distance?",
+    opts: ["22 metres", "32 metres", "44 metres", "58 metres"],
+    ans: 1,
+    exp: "At 50 km/h: reaction distance ≈ 14m + braking distance ≈ 18m = stopping distance ≈ 32 metres."
+  },
+  {
+    topic: "Part IV – Code of Conduct",
+    q: "On a wet road, the stopping distance is approximately:",
+    opts: ["The same as on a dry road", "Twice the distance compared to a dry road", "Half the distance", "Three times the distance"],
+    ans: 1,
+    exp: "On a wet road, stopping distance increases to about twice the distance of that on a dry road due to reduced tyre friction."
+  },
+  {
+    topic: "Part IV – Code of Conduct",
+    q: "What is 'Aquaplaning'?",
+    opts: ["Driving through a flooded road", "The vehicle gliding on a thin layer of water, losing steering and braking control", "Skidding on ice", "Braking on a sandy surface"],
+    ans: 1,
+    exp: "Aquaplaning occurs when the vehicle glides on a thin layer of water on the road surface, resulting in loss of steering control and braking efficiency."
+  },
+  {
+    topic: "Part IV – Code of Conduct",
+    q: "If the rear of your vehicle skids sideways, you should:",
+    opts: ["Brake hard immediately", "Accelerate to correct the skid", "Remove your foot from the accelerator and steer in the direction of the skid", "Steer in the opposite direction of the skid"],
+    ans: 2,
+    exp: "If the rear skids, remove your foot from the accelerator and steer in the direction of the skid. Never apply brakes during skid correction."
+  },
+  {
+    topic: "Part IV – Code of Conduct",
+    q: "What should you check before moving off?",
+    opts: ["Fuel level only", "Mirrors, give proper signal, look around to check traffic and pedestrians", "Only check the rearview mirror", "Ask a passenger to check"],
+    ans: 1,
+    exp: "Before moving off, fasten your seat belt, look in mirrors, give the proper signal, look around to check traffic and pedestrians, and move off only when safe."
+  },
+  {
+    topic: "Part IV – Code of Conduct",
+    q: "Mirrors should be checked before which actions?",
+    opts: ["Stopping only", "Moving off, slowing down, stopping, changing lane, overtaking and making any turn", "Overtaking only", "Only before parking"],
+    ans: 1,
+    exp: "Mirrors should be checked before moving off, slowing down, stopping, changing lane, overtaking and making any turn. Also check mirrors every 5–10 seconds while driving."
+  },
+  {
+    topic: "Part IV – Code of Conduct",
+    q: "Clear signals should be given at least how many seconds in advance of your manoeuvre?",
+    opts: ["1 second", "2 seconds", "3 seconds", "5 seconds"],
+    ans: 2,
+    exp: "Always give clear signals well in advance (at least 3 seconds) before your manoeuvre so other road users can react safely."
+  },
+  {
+    topic: "Part IV – Code of Conduct",
+    q: "Eighty percent of information perceived while driving comes through:",
+    opts: ["The driver's ears", "The driver's eyes", "The driver's sense of touch", "The driver's intuition"],
+    ans: 1,
+    exp: "80% of information perceived while driving comes through the driver's eyes."
+  },
+  {
+    topic: "Part IV – Code of Conduct",
+    q: "After passing through a flood, brakes may become ineffective. You should:",
+    opts: ["Stop and wait for brakes to dry", "Pump the brake pedal repeatedly until braking action returns", "Drive faster to dry the brakes", "Switch off the engine"],
+    ans: 1,
+    exp: "After passing through water, pump the brake pedal repeatedly until braking action returns, to dry the brakes."
+  },
+  {
+    topic: "Part IV – Code of Conduct",
+    q: "If you are dazzled by headlights of an oncoming vehicle, you should:",
+    opts: ["Flash your high beam back", "Look to your left to avoid the glare, use edge of road to guide, slow down and stop if blinding", "Accelerate past quickly", "Close one eye"],
+    ans: 1,
+    exp: "When dazzled, look to the left to avoid the glare. Use the edge of the road to guide your vehicle. If blinding, slow down and stop by the side of the road."
+  },
+  {
+    topic: "Part IV – Code of Conduct",
+    q: "When should you stop and give way to an emergency vehicle?",
+    opts: ["Only when it is behind you", "Pull over safely and allow it to pass; do not block intersections or follow closely", "Stop in the middle of the road immediately", "Sound your horn to warn other drivers"],
+    ans: 1,
+    exp: "Give way to emergency vehicles. Do not block intersections, follow closely behind, or slam your brakes in front of them. Stop safely and let them pass."
+  },
+  {
+    topic: "Part IV – Code of Conduct",
+    q: "What is the recommended safety gap to leave between your vehicle and the vehicle in front when stopping at a traffic light?",
+    opts: ["1 metre", "2 metres", "3 metres", "5 metres"],
+    ans: 1,
+    exp: "Leave a safety gap of 2 metres between your vehicle and the vehicle in front when stopped at a traffic light."
+  },
+  {
+    topic: "Part IV – Code of Conduct",
+    q: "Centrifugal force is most relevant when:",
+    opts: ["Driving in a straight line at high speed", "Driving round a bend or sharp corner – it pushes the vehicle outward from its path", "Braking on a wet road", "Reversing down a slope"],
+    ans: 1,
+    exp: "When driving round a bend at high speed, centrifugal force pushes the vehicle out of its path. Reduce speed before bends."
+  },
+  {
+    topic: "Part IV – Code of Conduct",
+    q: "When reversing, you must NOT:",
+    opts: ["Check your mirrors first", "Get help if your rear view is restricted", "Reverse from a side road or minor road into a main road", "Check for pedestrians behind you"],
+    ans: 2,
+    exp: "Do not reverse from a side road or minor road into a main road."
+  },
+  {
+    topic: "Part IV – Code of Conduct",
+    q: "When should you use dipped (low beam) headlights?",
+    opts: ["Only on unlit rural roads", "At night in built-up areas, during rainy weather, and when following or facing other vehicles", "Only on expressways", "During the day only"],
+    ans: 1,
+    exp: "Use dipped headlights at night in built-up areas, during rainy weather, when following other vehicles, and when facing oncoming vehicles."
+  },
+  {
+    topic: "Part IV – Code of Conduct",
+    q: "What is the correct action when your vehicle breaks down on an expressway?",
+    opts: ["Stop in the middle lane and switch on hazard lights", "Drive onto the road shoulder, switch on hazard lights, place a reflective warning triangle at least 20 metres behind the vehicle", "Stay in your vehicle with hazard lights off", "Wait for police before moving"],
+    ans: 1,
+    exp: "Push the vehicle to a breakdown bay or side. Switch on hazard lights and place a reflective warning triangle at least 20 metres behind the vehicle."
+  },
+
+  // ─── PART V: PARTS & CONTROLS ─────────────────────────────────
+  {
+    topic: "Part V – Parts & Controls of a Car",
+    q: "Which instrument on the dashboard measures the total distance a vehicle has travelled?",
+    opts: ["Speedometer", "Tachometer", "Tripmeter", "Odometer"],
+    ans: 3,
+    exp: "The Odometer measures the total distance the vehicle has travelled."
+  },
+  {
+    topic: "Part V – Parts & Controls of a Car",
+    q: "What does the Tachometer measure?",
+    opts: ["Vehicle speed in km/h", "Fuel level", "Engine revolutions per minute (RPM)", "Oil pressure"],
+    ans: 2,
+    exp: "The Tachometer measures the engine's revolutions per minute (RPM)."
+  },
+  {
+    topic: "Part V – Parts & Controls of a Car",
+    q: "What does an illuminated 'Oil Pressure Indicator' warn you about?",
+    opts: ["Low fuel", "Engine oil pressure is low – stop the engine", "Time to change tyres", "Battery is low"],
+    ans: 1,
+    exp: "The Oil Pressure Indicator warns that engine oil pressure is abnormal. You should stop the engine and investigate."
+  },
+  {
+    topic: "Part V – Parts & Controls of a Car",
+    q: "Tyre treads less than how many mm in depth should be replaced?",
+    opts: ["0.8 mm", "1.0 mm", "1.6 mm", "2.0 mm"],
+    ans: 2,
+    exp: "Tyres with treads less than 1.6mm in depth should be replaced. Bald tyres cause skids under emergency braking."
+  },
+
+  // ─── PART VI & VII: WORK ZONES & SCHOOL ZONES ────────────────
+  {
+    topic: "Part VI/VII – Work Zones & School Zones",
+    q: "At a work zone, you must NOT exceed any temporary maximum speed limit because:",
+    opts: ["It is an advisory suggestion only", "It is for your safety and the safety of workers", "It only applies to heavy vehicles", "It applies only during school hours"],
+    ans: 1,
+    exp: "You must not exceed any temporary maximum speed limit posted at a work zone for your safety and the safety of road workers."
+  },
+  {
+    topic: "Part VI/VII – Work Zones & School Zones",
+    q: "In a school zone, the sections in brick red on the road surface indicate:",
+    opts: ["No overtaking allowed", "A school zone – slow down and look out for children on the road", "Pedestrian crossing only", "Bus stop ahead"],
+    ans: 1,
+    exp: "Brick red sections on the road indicate a school zone. Slow down and look out for children on the road."
+  },
+
+  // ─── PART VIII: DRIVING IN TUNNELS ───────────────────────────
+  {
+    topic: "Part VIII – Driving in Tunnels",
+    q: "When driving in a tunnel, which of the following is a 'DO'?",
+    opts: ["Sound your horn freely", "Overtake slow vehicles", "Turn on vehicle headlights and radio", "Make U-turns if necessary"],
+    ans: 2,
+    exp: "In a tunnel, you must turn on your vehicle headlights and radio (for emergency broadcasts). Sounding horn, overtaking, and U-turns are prohibited except in emergencies."
+  },
+  {
+    topic: "Part VIII – Driving in Tunnels",
+    q: "In the tunnel, which vehicles are prohibited from entering?",
+    opts: ["Motorcycles", "Cars with passengers", "Vehicles carrying dangerous goods or insufficient fuel", "Vehicles without air-conditioning"],
+    ans: 2,
+    exp: "Vehicles prohibited from tunnels include those with insufficient fuel, those carrying uncontrolled animals or uncovered garbage, and vehicles carrying dangerous goods."
+  },
+  {
+    topic: "Part VIII – Driving in Tunnels",
+    q: "In a tunnel emergency, cross-passage doors are located at intervals of approximately:",
+    opts: ["50m in the main tunnel", "100m in the main tunnel", "200m in the main tunnel", "500m in the main tunnel"],
+    ans: 1,
+    exp: "Cross-passage doors next to the fast lanes are located at intervals of 100m in the main tunnel."
+  },
+  {
+    topic: "Part VIII – Driving in Tunnels",
+    q: "Escape staircase doors in the main tunnel (KPE/MCE/CTE) can be found at intervals of approximately:",
+    opts: ["100m", "200m", "500m", "1000m"],
+    ans: 2,
+    exp: "Escape staircase doors can generally be found at intervals of 500m in the main tunnel."
+  },
+  {
+    topic: "Part VIII – Driving in Tunnels",
+    q: "Vehicles with a speed limit of 60 km/h and below in a tunnel shall drive along:",
+    opts: ["The right lane", "The centre lane", "The left lane", "Any available lane"],
+    ans: 2,
+    exp: "Vehicles with a speed limit of 60 km/h and below shall be driven along the left lane of the expressway/tunnel."
+  },
+
+  // ─── PART IX & X: SECURITY & MOTOR CLAIMS ───────────────────
+  {
+    topic: "Part IX/X – Security & Motor Claims",
+    q: "To prevent car theft, you should:",
+    opts: ["Leave windows slightly open for ventilation", "Remove ignition key, wind up windows, lock all doors and activate security devices when leaving vehicle unattended", "Park in poorly lit areas to avoid attention", "Leave the engine running briefly while away"],
+    ans: 1,
+    exp: "Remove the ignition key, wind up all windows, lock all doors, and use additional security devices (alarm, immobiliser) whenever leaving the vehicle unattended."
+  },
+  {
+    topic: "Part IX/X – Security & Motor Claims",
+    q: "After a traffic accident, you should report and bring your accident vehicle to the approved reporting centre within:",
+    opts: ["48 hours", "72 hours", "24 hours or by the next working day", "One week"],
+    ans: 2,
+    exp: "You must report and bring your accident vehicle to the approved reporting centre/authorised workshop within 24 hours or by the next working day."
+  },
+  {
+    topic: "Part IX/X – Security & Motor Claims",
+    q: "At an accident scene, which of the following should you photograph?",
+    opts: ["Only the damage to your vehicle", "The scene, your vehicle, and all other vehicles involved (with licence plates)", "Only the other vehicle's damage", "Nothing – wait for police to photograph"],
+    ans: 1,
+    exp: "Photograph the accident scene, your own vehicle's damage (with licence plate), and all other vehicles involved (capturing their licence plates)."
+  },
+
+,
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this mandatory sign require you to do?",
+    svg: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" width="150" height="150"><circle cx="60" cy="60" r="54" fill="#1565C0"/><line x1="60" y1="82" x2="60" y2="32" stroke="white" stroke-width="11" stroke-linecap="round"/><polyline points="42,50 60,32 78,50" stroke="white" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
+    opts: ["Turn left only", "Proceed straight ahead only – turning is not permitted", "Give way then proceed", "Enter a one-way road"],
+    ans: 1,
+    exp: "A blue circle with a white upward arrow is an Ahead Only mandatory sign. You must go straight ahead – turning is an offence."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this mandatory sign require at this point?",
+    svg: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" width="150" height="150"><circle cx="60" cy="60" r="54" fill="#1565C0"/><path d="M38,82 L38,52 Q38,30 62,30 L78,30" stroke="white" stroke-width="11" stroke-linecap="round" fill="none"/><polyline points="62,17 78,30 62,43" stroke="white" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
+    opts: ["U-turn permitted here", "Turn right only", "Slow down then turn right if clear", "Overtake on the right"],
+    ans: 1,
+    exp: "A blue circle with a rightward-curving arrow is a Turn Right Only sign. You must turn right here. Disobeying is an offence."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this mandatory sign require?",
+    svg: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" width="150" height="150"><circle cx="60" cy="60" r="54" fill="#1565C0"/><path d="M82,82 L82,52 Q82,30 58,30 L42,30" stroke="white" stroke-width="11" stroke-linecap="round" fill="none"/><polyline points="58,17 42,30 58,43" stroke="white" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
+    opts: ["Turn left only", "Turn right only", "Keep to the left of the obstruction", "U-turn permitted"],
+    ans: 0,
+    exp: "A blue circle with a leftward-curving white arrow is a Turn Left Only sign. You must turn left at this point."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this mandatory sign mean?",
+    svg: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" width="150" height="150"><circle cx="60" cy="60" r="54" fill="#1565C0"/><rect x="64" y="22" width="15" height="76" rx="5" fill="white"/><path d="M88,60 L48,60" stroke="white" stroke-width="11" stroke-linecap="round" fill="none"/><polyline points="65,43 48,60 65,77" stroke="white" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
+    opts: ["You may pass on either side", "Pass to the LEFT of the divider or obstruction only", "Keep right at all times", "Split into two lanes"],
+    ans: 1,
+    exp: "The Keep Left sign (blue circle, arrow passing left of a vertical divider) requires vehicles to pass on the left side only."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this mandatory sign allow?",
+    svg: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" width="150" height="150"><circle cx="60" cy="60" r="54" fill="#1565C0"/><line x1="60" y1="85" x2="60" y2="55" stroke="white" stroke-width="10" stroke-linecap="round"/><path d="M60,55 Q60,32 80,32" stroke="white" stroke-width="10" stroke-linecap="round" fill="none"/><path d="M60,55 Q60,32 40,32" stroke="white" stroke-width="10" stroke-linecap="round" fill="none"/><polyline points="68,44 80,32 68,20" stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/><polyline points="52,44 40,32 52,20" stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
+    opts: ["Vehicles must keep strictly to the left lane", "Vehicles may pass on either side of the obstruction or island", "Overtaking is permitted", "Two-way road begins"],
+    ans: 1,
+    exp: "The Split Traffic sign (blue circle, arrows diverging both ways) means vehicles may pass on either side."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this sign mean?",
+    svg: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" width="150" height="150"><rect x="5" y="5" width="110" height="110" rx="12" fill="#CC0000"/><rect x="16" y="51" width="88" height="18" rx="5" fill="white"/></svg>`,
+    opts: ["No parking at all times", "No entry for all vehicles", "No stopping during restricted hours", "Speed limit zone ahead"],
+    ans: 1,
+    exp: "A red rectangle with a white horizontal bar is the No Entry prohibitory sign. No vehicles may enter beyond this sign."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this sign require of drivers?",
+    svg: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" width="150" height="150"><circle cx="60" cy="60" r="54" fill="white" stroke="#CC0000" stroke-width="10"/><text x="60" y="76" text-anchor="middle" font-size="42" font-weight="bold" font-family="Arial,sans-serif" fill="#1a1a1a">50</text></svg>`,
+    opts: ["Minimum speed is 50 km/h", "Recommended speed is 50 km/h", "Do not exceed 50 km/h", "Speed limit ends here"],
+    ans: 2,
+    exp: "A white circle with a red border displaying the number 50 is a Speed Limit sign – do not exceed 50 km/h."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this sign mean?",
+    svg: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" width="150" height="150"><circle cx="60" cy="60" r="54" fill="white" stroke="#CC0000" stroke-width="10"/><text x="60" y="76" text-anchor="middle" font-size="42" font-weight="bold" font-family="Arial,sans-serif" fill="#1a1a1a">70</text></svg>`,
+    opts: ["Do not exceed 70 km/h", "Minimum speed is 70 km/h", "Expressway speed zone begins", "Advisory speed of 70 km/h"],
+    ans: 0,
+    exp: "A white circle with a red border displaying 70 means do not exceed 70 km/h. It is a prohibitory sign."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this prohibitory sign mean?",
+    svg: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" width="150" height="150"><circle cx="60" cy="60" r="54" fill="white" stroke="#CC0000" stroke-width="10"/><path d="M35,82 L35,52 Q35,30 58,30 L75,30" stroke="#333" stroke-width="8" stroke-linecap="round" fill="none"/><polyline points="58,18 75,30 58,42" stroke="#333" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="22" y1="22" x2="98" y2="98" stroke="#CC0000" stroke-width="9" stroke-linecap="round"/></svg>`,
+    opts: ["Give way before turning right", "No right turn at any time – turning right here is an offence", "Right turn permitted when road is clear", "Slow down before turning right"],
+    ans: 1,
+    exp: "A white circle with a red border, a right-turn arrow, and a red diagonal slash means No Right Turn. It is an offence to turn right here."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this sign prohibit?",
+    svg: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" width="150" height="150"><circle cx="60" cy="60" r="54" fill="white" stroke="#CC0000" stroke-width="10"/><path d="M85,82 L85,52 Q85,30 62,30 L45,30" stroke="#333" stroke-width="8" stroke-linecap="round" fill="none"/><polyline points="62,18 45,30 62,42" stroke="#333" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/><line x1="22" y1="22" x2="98" y2="98" stroke="#CC0000" stroke-width="9" stroke-linecap="round"/></svg>`,
+    opts: ["No right turn", "No left turn at any time – an offence to turn left", "Left turn permitted on red light", "Slow down before turning left"],
+    ans: 1,
+    exp: "A white circle with a red border, a left-turn arrow, and a red diagonal slash means No Left Turn. Turning left is an offence."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this sign mean for road users?",
+    svg: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" width="150" height="150"><circle cx="60" cy="60" r="54" fill="white" stroke="#CC0000" stroke-width="10"/><line x1="28" y1="28" x2="92" y2="92" stroke="#CC0000" stroke-width="10" stroke-linecap="round"/><line x1="92" y1="28" x2="28" y2="92" stroke="#CC0000" stroke-width="10" stroke-linecap="round"/></svg>`,
+    opts: ["No parking at all times", "No waiting – brief stops for pick-up/drop-off only", "No stopping at all on this road section", "No entry for heavy vehicles"],
+    ans: 2,
+    exp: "A white circle with a red border and a red X means No Stopping. Vehicles cannot stop at all on this road section at any time."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this sign allow and prohibit?",
+    svg: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" width="150" height="150"><circle cx="60" cy="60" r="54" fill="white" stroke="#CC0000" stroke-width="10"/><line x1="25" y1="25" x2="95" y2="95" stroke="#CC0000" stroke-width="10" stroke-linecap="round"/></svg>`,
+    opts: ["No stopping at all times", "No parking at all times – immediate pick-up and drop-off of passengers is allowed", "No entry for lorries", "No overtaking"],
+    ans: 1,
+    exp: "A single red diagonal slash through a white circle means No Waiting. Vehicles may only stop momentarily for immediate boarding or alighting of passengers."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this prohibitory sign mean?",
+    svg: `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" width="150" height="150"><circle cx="60" cy="60" r="54" fill="white" stroke="#CC0000" stroke-width="10"/><rect x="14" y="58" width="36" height="16" rx="3" fill="#333"/><rect x="19" y="46" width="23" height="13" rx="2" fill="#333"/><rect x="60" y="52" width="36" height="16" rx="3" fill="#888"/><rect x="65" y="40" width="23" height="13" rx="2" fill="#888"/><line x1="22" y1="22" x2="98" y2="98" stroke="#CC0000" stroke-width="8" stroke-linecap="round"/></svg>`,
+    opts: ["No entry for cars in this lane", "Overtaking is not permitted on this stretch of road", "No stopping alongside another vehicle", "Speed limit zone"],
+    ans: 1,
+    exp: "Two vehicle silhouettes with a red diagonal slash is the No Overtaking sign. Overtaking is forbidden on this road section."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "You see this warning sign. What should you do?",
+    svg: `<svg viewBox="0 0 130 115" xmlns="http://www.w3.org/2000/svg" width="160" height="140"><polygon points="65,8 124,108 6,108" fill="white" stroke="#CC0000" stroke-width="7" stroke-linejoin="round"/><path d="M48,96 Q48,48 82,38" stroke="#333" stroke-width="8" stroke-linecap="round" fill="none"/></svg>`,
+    opts: ["Turn right immediately", "Slow down, keep left, do not overtake, make a U-turn or park", "Stop and sound horn before proceeding", "Increase speed to safely navigate the bend"],
+    ans: 1,
+    exp: "A triangle with a rightward-curving road is a Right Bend warning. Slow down, keep left, do not overtake, make a U-turn, or park your vehicle."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What warning does this sign give and what action is needed?",
+    svg: `<svg viewBox="0 0 130 115" xmlns="http://www.w3.org/2000/svg" width="160" height="140"><polygon points="65,8 124,108 6,108" fill="white" stroke="#CC0000" stroke-width="7" stroke-linejoin="round"/><path d="M82,96 Q82,48 48,38" stroke="#333" stroke-width="8" stroke-linecap="round" fill="none"/></svg>`,
+    opts: ["Right bend ahead – keep right", "Left bend ahead – slow down, keep left, do not overtake or park", "T-junction ahead", "Series of bends ahead"],
+    ans: 1,
+    exp: "A triangle with a leftward-curving road is a Left Bend warning. Slow down, keep left, do not overtake, make a U-turn or park."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this warning sign indicate and what must you do?",
+    svg: `<svg viewBox="0 0 130 115" xmlns="http://www.w3.org/2000/svg" width="160" height="140"><polygon points="65,8 124,108 6,108" fill="white" stroke="#CC0000" stroke-width="7" stroke-linejoin="round"/><line x1="65" y1="40" x2="65" y2="96" stroke="#333" stroke-width="9" stroke-linecap="round"/><line x1="36" y1="68" x2="94" y2="68" stroke="#333" stroke-width="9" stroke-linecap="round"/></svg>`,
+    opts: ["No through road", "Cross junction ahead – slow down, beware of traffic from all directions", "Pedestrian crossing ahead", "Road works ahead"],
+    ans: 1,
+    exp: "A triangle with a plus symbol warns of a Cross Junction. Slow down and beware of traffic approaching from all directions."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this warning sign indicate?",
+    svg: `<svg viewBox="0 0 130 115" xmlns="http://www.w3.org/2000/svg" width="160" height="140"><polygon points="65,8 124,108 6,108" fill="white" stroke="#CC0000" stroke-width="7" stroke-linejoin="round"/><line x1="34" y1="68" x2="96" y2="68" stroke="#333" stroke-width="9" stroke-linecap="round"/><line x1="65" y1="68" x2="65" y2="96" stroke="#333" stroke-width="9" stroke-linecap="round"/></svg>`,
+    opts: ["Cross junction ahead", "T-junction ahead – slow down, give way to traffic from the right and left", "Merging traffic from the right", "End of dual carriageway"],
+    ans: 1,
+    exp: "A triangle with a T symbol warns of a T-Junction. Slow down and give way to traffic approaching from the right and left."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this warning sign mean?",
+    svg: `<svg viewBox="0 0 130 115" xmlns="http://www.w3.org/2000/svg" width="160" height="140"><polygon points="65,8 124,108 6,108" fill="white" stroke="#CC0000" stroke-width="7" stroke-linejoin="round"/><circle cx="65" cy="72" r="20" fill="none" stroke="#333" stroke-width="7"/><polyline points="65,50 60,58 70,58" stroke="#333" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
+    opts: ["One-way circular road ahead", "Roundabout ahead – slow down, stop if necessary, give way to traffic on your right", "Traffic lights ahead", "No U-turn zone"],
+    ans: 1,
+    exp: "A triangle with a circular arrow warns of a Roundabout. Slow down, stop if necessary, and give way to all traffic on your right."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this warning sign indicate and what should you do?",
+    svg: `<svg viewBox="0 0 130 115" xmlns="http://www.w3.org/2000/svg" width="160" height="140"><polygon points="65,8 124,108 6,108" fill="white" stroke="#CC0000" stroke-width="7" stroke-linejoin="round"/><path d="M22,88 Q65,40 108,88" stroke="#333" stroke-width="8" stroke-linecap="round" fill="none"/><line x1="10" y1="88" x2="22" y2="88" stroke="#333" stroke-width="8" stroke-linecap="round"/><line x1="108" y1="88" x2="120" y2="88" stroke="#333" stroke-width="8" stroke-linecap="round"/></svg>`,
+    opts: ["Slow down, keep left, do not overtake – road hump ahead", "Stop completely before the hump", "Hump road ends ahead", "Change to a higher gear before the hump"],
+    ans: 0,
+    exp: "A triangle with a hump profile is Road Hump Ahead. Slow down and keep left; do not overtake."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this warning sign mean?",
+    svg: `<svg viewBox="0 0 130 115" xmlns="http://www.w3.org/2000/svg" width="160" height="140"><polygon points="65,8 124,108 6,108" fill="white" stroke="#CC0000" stroke-width="7" stroke-linejoin="round"/><circle cx="58" cy="42" r="9" fill="#333"/><line x1="58" y1="51" x2="58" y2="73" stroke="#333" stroke-width="7" stroke-linecap="round"/><line x1="58" y1="62" x2="43" y2="70" stroke="#333" stroke-width="6" stroke-linecap="round"/><line x1="58" y1="62" x2="72" y2="58" stroke="#333" stroke-width="6" stroke-linecap="round"/><line x1="58" y1="73" x2="47" y2="90" stroke="#333" stroke-width="6" stroke-linecap="round"/><line x1="58" y1="73" x2="70" y2="90" stroke="#333" stroke-width="6" stroke-linecap="round"/></svg>`,
+    opts: ["School zone boundary sign", "Children nearby – slow down and watch carefully for children crossing", "Pedestrian crossing 100m ahead", "Playground entrance ahead"],
+    ans: 1,
+    exp: "A triangle with a child figure means Children. Slow down and beware of children crossing the road."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "This warning sign is ahead. What must you do?",
+    svg: `<svg viewBox="0 0 130 115" xmlns="http://www.w3.org/2000/svg" width="160" height="140"><polygon points="65,8 124,108 6,108" fill="white" stroke="#CC0000" stroke-width="7" stroke-linejoin="round"/><rect x="34" y="55" width="40" height="18" rx="4" fill="#333"/><rect x="39" y="42" width="28" height="14" rx="3" fill="#333"/><path d="M28,82 Q44,76 58,82 Q72,88 86,82 Q98,77 108,82" stroke="#555" stroke-width="3.5" fill="none" stroke-dasharray="5,3"/></svg>`,
+    opts: ["Stop and inspect the road before proceeding", "Slow down and drive carefully – road surface is slippery", "Use low gear only on this stretch", "Switch to 4-wheel drive mode"],
+    ans: 1,
+    exp: "A triangle with a car and skid marks is a Slippery Road warning. Slow down and drive carefully."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this warning sign require?",
+    svg: `<svg viewBox="0 0 130 115" xmlns="http://www.w3.org/2000/svg" width="160" height="140"><polygon points="65,8 124,108 6,108" fill="white" stroke="#CC0000" stroke-width="7" stroke-linejoin="round"/><circle cx="65" cy="40" r="9" fill="#333"/><line x1="65" y1="49" x2="65" y2="72" stroke="#333" stroke-width="7" stroke-linecap="round"/><line x1="65" y1="60" x2="51" y2="68" stroke="#333" stroke-width="6" stroke-linecap="round"/><line x1="65" y1="60" x2="79" y2="68" stroke="#333" stroke-width="6" stroke-linecap="round"/><line x1="65" y1="72" x2="54" y2="88" stroke="#333" stroke-width="6" stroke-linecap="round"/><line x1="65" y1="72" x2="76" y2="88" stroke="#333" stroke-width="6" stroke-linecap="round"/></svg>`,
+    opts: ["Pedestrians must use the underpass", "Slow down and be ready to stop for pedestrians to cross at the designated crossing", "Sound horn to warn pedestrians of your approach", "No pedestrians are allowed on this road"],
+    ans: 1,
+    exp: "A triangle with a walking figure and crossing stripes warns of a Pedestrian Crossing Ahead. Slow down and stop for pedestrians."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this warning sign mean?",
+    svg: `<svg viewBox="0 0 130 115" xmlns="http://www.w3.org/2000/svg" width="160" height="140"><polygon points="65,8 124,108 6,108" fill="white" stroke="#CC0000" stroke-width="7" stroke-linejoin="round"/><path d="M22,88 L38,88 L44,64 L50,88 L62,88 L68,70 L74,88 L108,88" stroke="#333" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
+    opts: ["Road narrows on both sides", "Uneven road surface – slow down, keep left, do not overtake", "Speed hump series ahead", "Road works and uneven surface"],
+    ans: 1,
+    exp: "A triangle with an uneven profile warns of an Uneven Road. Slow down, keep left, and do not overtake."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this warning sign require you to do?",
+    svg: `<svg viewBox="0 0 130 115" xmlns="http://www.w3.org/2000/svg" width="160" height="140"><polygon points="65,8 124,108 6,108" fill="white" stroke="#CC0000" stroke-width="7" stroke-linejoin="round"/><line x1="30" y1="50" x2="95" y2="88" stroke="#333" stroke-width="9" stroke-linecap="round"/><polyline points="75,60 95,88 65,88" stroke="#333" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
+    opts: ["Accelerate to maintain momentum downhill", "Keep left, change to a lower gear, do not overtake, U-turn or park", "Stop and apply handbrake before descending", "Use neutral gear when going downhill"],
+    ans: 1,
+    exp: "A triangle with a downward slope is a Steep Downward Slope warning. Keep left, change to a lower gear, do not overtake, U-turn or park."
+  },
+
+  {
+    topic: "Traffic Lights - Visual",
+    q: "The RED light is showing. What must you do?",
+    svg: `<svg viewBox="0 0 60 160" xmlns="http://www.w3.org/2000/svg" width="75" height="200"><rect x="4" y="4" width="52" height="152" rx="10" fill="#1a1a1a"/><circle cx="30" cy="32" r="19" fill="#CC2200"/><circle cx="30" cy="80" r="19" fill="#2a2a2a"/><circle cx="30" cy="128" r="19" fill="#2a2a2a"/></svg>`,
+    opts: ["Slow down and proceed with extra caution", "Stop before and close to the stop-line and wait for the green", "Give way to traffic from the right only", "Flash headlights to warn others then proceed"],
+    ans: 1,
+    exp: "RED means STOP. You must stop before the stop-line and wait."
+  },
+
+  {
+    topic: "Traffic Lights - Visual",
+    q: "The AMBER light is showing. What must you do?",
+    svg: `<svg viewBox="0 0 60 160" xmlns="http://www.w3.org/2000/svg" width="75" height="200"><rect x="4" y="4" width="52" height="152" rx="10" fill="#1a1a1a"/><circle cx="30" cy="32" r="19" fill="#2a2a2a"/><circle cx="30" cy="80" r="19" fill="#FF9900"/><circle cx="30" cy="128" r="19" fill="#2a2a2a"/></svg>`,
+    opts: ["Accelerate to clear the junction before it turns red", "Stop, unless you are already so close to the stop-line that stopping safely is impossible", "Sound horn and proceed", "Give way to pedestrians only"],
+    ans: 1,
+    exp: "AMBER means STOP, unless you are so close to the stop-line that you cannot stop safely."
+  },
+
+  {
+    topic: "Traffic Lights - Visual",
+    q: "The GREEN light is showing. What should you do?",
+    svg: `<svg viewBox="0 0 60 160" xmlns="http://www.w3.org/2000/svg" width="75" height="200"><rect x="4" y="4" width="52" height="152" rx="10" fill="#1a1a1a"/><circle cx="30" cy="32" r="19" fill="#2a2a2a"/><circle cx="30" cy="80" r="19" fill="#2a2a2a"/><circle cx="30" cy="128" r="19" fill="#00BB00"/></svg>`,
+    opts: ["Proceed immediately without checking", "Look left and right to ensure it is safe, then go", "Sound your horn before moving off", "Wait for the amber light before proceeding"],
+    ans: 1,
+    exp: "GREEN means GO. Always look left and right to ensure it is safe before proceeding."
+  },
+
+  {
+    topic: "Traffic Lights - Visual",
+    q: "This traffic signal is FLASHING AMBER. What does it mean and what should you do?",
+    svg: `<svg viewBox="0 0 90 165" xmlns="http://www.w3.org/2000/svg" width="100" height="185"><rect x="4" y="4" width="52" height="152" rx="10" fill="#1a1a1a" stroke="#FF9900" stroke-width="3" stroke-dasharray="8,4"/><circle cx="30" cy="32" r="19" fill="#2a2a2a"/><circle cx="30" cy="80" r="19" fill="#FF9900"/><circle cx="30" cy="128" r="19" fill="#2a2a2a"/><text x="64" y="86" font-size="12" fill="#FF9900" font-weight="bold" font-family="Arial">FLASH</text></svg>`,
+    opts: ["The signal is about to turn green – speed up slightly", "Traffic signals are out of order – proceed with caution and give way to traffic on the right", "All traffic must stop completely and await police direction", "Emergency vehicle is approaching – pull over"],
+    ans: 1,
+    exp: "Flashing amber means traffic signals are out of order. Proceed with caution and give way to traffic on the right."
+  },
+
+  {
+    topic: "Traffic Lights - Visual",
+    q: "The main lights show red and a separate GREEN ARROW points right. What may you do?",
+    svg: `<svg viewBox="0 0 120 165" xmlns="http://www.w3.org/2000/svg" width="140" height="185"><rect x="4" y="4" width="52" height="152" rx="10" fill="#1a1a1a"/><circle cx="30" cy="32" r="19" fill="#CC2200"/><circle cx="30" cy="80" r="19" fill="#2a2a2a"/><circle cx="30" cy="128" r="19" fill="#2a2a2a"/><rect x="62" y="4" width="54" height="54" rx="10" fill="#1a1a1a"/><path d="M70,31 L102,31 M102,31 L90,19 M102,31 L90,43" stroke="#00BB00" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
+    opts: ["All vehicles may go in any direction since there is a green signal", "Go in the direction of the arrow only, after ensuring oncoming traffic is clear", "Stop – the red light overrides the green arrow", "Pedestrians must clear the crossing first before you may turn"],
+    ans: 1,
+    exp: "A green arrow means GO in the direction indicated only (right turn here), but only after ensuring oncoming traffic is clear."
+  },
+
+  {
+    topic: "Road Markings - Visual",
+    q: "What does this continuous yellow line along the kerb indicate?",
+    svg: `<svg viewBox="0 0 240 90" xmlns="http://www.w3.org/2000/svg" width="288" height="108"><rect x="0" y="0" width="240" height="90" fill="#888"/><rect x="0" y="0" width="14" height="90" fill="#bbb"/><line x1="18" y1="45" x2="230" y2="45" stroke="#FFD700" stroke-width="7"/><text x="124" y="22" text-anchor="middle" font-size="12" fill="white" font-family="Arial,sans-serif">CONTINUOUS YELLOW LINE</text></svg>`,
+    opts: ["No stopping at any time on this road", "No parking from 7.00am to 7.00pm, except Sundays and public holidays", "No parking at all times – pick-up/drop-off allowed", "Bus lane boundary line"],
+    ans: 1,
+    exp: "A continuous yellow line along the road means no parking from 7.00am to 7.00pm, except on Sundays and public holidays."
+  },
+
+  {
+    topic: "Road Markings - Visual",
+    q: "What do these double yellow zig-zag lines indicate?",
+    svg: `<svg viewBox="0 0 240 90" xmlns="http://www.w3.org/2000/svg" width="288" height="108"><rect x="0" y="0" width="240" height="90" fill="#888"/><rect x="0" y="0" width="14" height="90" fill="#bbb"/><polyline points="18,28 44,14 70,28 96,14 122,28 148,14 174,28 200,14 226,28" stroke="#FFD700" stroke-width="5" fill="none"/><polyline points="18,44 44,30 70,44 96,30 122,44 148,30 174,44 200,30 226,44" stroke="#FFD700" stroke-width="5" fill="none"/><text x="124" y="74" text-anchor="middle" font-size="11" fill="white" font-family="Arial,sans-serif">DOUBLE YELLOW ZIG-ZAG</text></svg>`,
+    opts: ["No parking at all times – pick-up/drop-off still allowed", "No stopping at all times on that side of the road", "No overtaking on this road section", "School zone boundary"],
+    ans: 1,
+    exp: "Double yellow zig-zag lines mean No Stopping at all times on that side of the road. Violation attracts demerit points and a fine."
+  },
+
+  {
+    topic: "Road Markings - Visual",
+    q: "What does this single yellow zig-zag line indicate?",
+    svg: `<svg viewBox="0 0 240 90" xmlns="http://www.w3.org/2000/svg" width="288" height="108"><rect x="0" y="0" width="240" height="90" fill="#888"/><rect x="0" y="0" width="14" height="90" fill="#bbb"/><polyline points="18,38 44,20 70,38 96,20 122,38 148,20 174,38 200,20 226,38" stroke="#FFD700" stroke-width="6" fill="none"/><text x="124" y="72" text-anchor="middle" font-size="11" fill="white" font-family="Arial,sans-serif">SINGLE YELLOW ZIG-ZAG</text></svg>`,
+    opts: ["No stopping at all times", "No parking at all times, except for immediate pick-up or drop-off of passengers", "No overtaking zone", "Pedestrian crossing area"],
+    ans: 1,
+    exp: "A single yellow zig-zag line means No Parking at all times, except for immediate picking up and letting down of passengers."
+  },
+
+  {
+    topic: "Road Markings - Visual",
+    q: "What do these double continuous white lines in the centre of the road mean?",
+    svg: `<svg viewBox="0 0 240 90" xmlns="http://www.w3.org/2000/svg" width="288" height="108"><rect x="0" y="0" width="240" height="90" fill="#777"/><line x1="0" y1="38" x2="240" y2="38" stroke="white" stroke-width="5"/><line x1="0" y1="52" x2="240" y2="52" stroke="white" stroke-width="5"/><text x="55" y="30" text-anchor="middle" font-size="14" fill="white" font-family="Arial">-&gt;</text><text x="185" y="76" text-anchor="middle" font-size="14" fill="white" font-family="Arial">&lt;-</text><text x="120" y="75" text-anchor="middle" font-size="10" fill="#ccc" font-family="Arial,sans-serif">DO NOT CROSS</text></svg>`,
+    opts: ["You may cross when you can see it is clear ahead", "You may cross to overtake a dangerously slow vehicle", "Vehicles may not cross these lines, and U-turns and right turns are also not permitted at these lines", "Parking is allowed between the two white lines"],
+    ans: 2,
+    exp: "Parallel continuous white lines in the centre mean no crossing, no parking either side, no U-turns and no right turns at these lines."
+  },
+
+  {
+    topic: "Road Markings - Visual",
+    q: "What do these road markings across the road indicate? What must approaching traffic do?",
+    svg: `<svg viewBox="0 0 240 90" xmlns="http://www.w3.org/2000/svg" width="288" height="108"><rect x="0" y="0" width="240" height="90" fill="#888"/><rect x="0" y="0" width="14" height="90" fill="#bbb"/><rect x="18" y="33" width="20" height="9" rx="2" fill="white"/><rect x="52" y="33" width="20" height="9" rx="2" fill="white"/><rect x="86" y="33" width="20" height="9" rx="2" fill="white"/><rect x="120" y="33" width="20" height="9" rx="2" fill="white"/><rect x="154" y="33" width="20" height="9" rx="2" fill="white"/><rect x="188" y="33" width="20" height="9" rx="2" fill="white"/><rect x="18" y="48" width="20" height="9" rx="2" fill="white"/><rect x="52" y="48" width="20" height="9" rx="2" fill="white"/><rect x="86" y="48" width="20" height="9" rx="2" fill="white"/><rect x="120" y="48" width="20" height="9" rx="2" fill="white"/><rect x="154" y="48" width="20" height="9" rx="2" fill="white"/><rect x="188" y="48" width="20" height="9" rx="2" fill="white"/><text x="124" y="20" text-anchor="middle" font-size="11" fill="white" font-family="Arial,sans-serif">GIVE WAY LINES (across road)</text></svg>`,
+    opts: ["Stop completely before proceeding", "Give way to traffic on the major road before proceeding", "These are decorative – no action required", "Zebra crossing – stop for pedestrians"],
+    ans: 1,
+    exp: "Parallel broken white lines across the road are Give Way lines. Approaching traffic must give way to traffic on the major road."
+  },
+
+  {
+    topic: "Dashboard & Controls - Visual",
+    q: "This warning light appears on your dashboard. What does it indicate?",
+    svg: `<svg viewBox="0 0 110 65" xmlns="http://www.w3.org/2000/svg" width="165" height="98"><rect x="0" y="0" width="110" height="65" rx="8" fill="#111"/><rect x="14" y="17" width="54" height="28" rx="4" fill="none" stroke="#FF6600" stroke-width="3.5"/><rect x="68" y="25" width="10" height="12" rx="2" fill="#FF6600"/><text x="24" y="37" font-size="20" fill="#FF6600" font-weight="bold" font-family="Arial">+</text><text x="48" y="37" font-size="20" fill="#FF6600" font-weight="bold" font-family="Arial">-</text></svg>`,
+    opts: ["Low fuel level", "Engine overheating – stop immediately", "Battery or charging system fault", "Oil pressure critically low"],
+    ans: 2,
+    exp: "The battery symbol (+/-) warns of a charging system or battery fault. Have the electrical system checked immediately."
+  },
+
+  {
+    topic: "Dashboard & Controls - Visual",
+    q: "This red warning light appears while driving. What must you do?",
+    svg: `<svg viewBox="0 0 110 65" xmlns="http://www.w3.org/2000/svg" width="165" height="98"><rect x="0" y="0" width="110" height="65" rx="8" fill="#111"/><rect x="20" y="14" width="26" height="24" rx="3" fill="#FF4500"/><path d="M46,20 L64,13 L64,29 L46,29" fill="#FF4500"/><rect x="17" y="36" width="32" height="5" rx="2" fill="#FF4500"/><circle cx="33" cy="52" r="6" fill="#FF4500"/></svg>`,
+    opts: ["Refuel at the next station", "Stop safely and switch off the engine immediately – oil pressure is critically low", "Top up the coolant reservoir", "Change to a lower gear to reduce engine load"],
+    ans: 1,
+    exp: "The oil pressure warning (oil-can symbol) means engine oil pressure is critically low. Stop the engine at once to prevent serious damage."
+  },
+
+  {
+    topic: "Dashboard & Controls - Visual",
+    q: "This blue indicator is lit on your dashboard. What does it mean?",
+    svg: `<svg viewBox="0 0 110 65" xmlns="http://www.w3.org/2000/svg" width="165" height="98"><rect x="0" y="0" width="110" height="65" rx="8" fill="#111"/><circle cx="28" cy="32" r="14" fill="none" stroke="#4488FF" stroke-width="3"/><line x1="44" y1="32" x2="98" y2="32" stroke="#4488FF" stroke-width="3" stroke-linecap="round"/><line x1="44" y1="21" x2="98" y2="8" stroke="#4488FF" stroke-width="3" stroke-linecap="round"/><line x1="44" y1="43" x2="98" y2="56" stroke="#4488FF" stroke-width="3" stroke-linecap="round"/></svg>`,
+    opts: ["Fog lights are switched on", "High beam (full beam) headlights are currently on", "Daytime running lights are active", "Low beam headlights are on"],
+    ans: 1,
+    exp: "The high beam indicator (blue headlight with rays) shows that your full/high beam headlights are switched on. Dip when facing other vehicles."
+  },
+
+  {
+    topic: "Dashboard & Controls - Visual",
+    q: "This warning light comes on while driving. What does it indicate?",
+    svg: `<svg viewBox="0 0 110 65" xmlns="http://www.w3.org/2000/svg" width="165" height="98"><rect x="0" y="0" width="110" height="65" rx="8" fill="#111"/><rect x="15" y="10" width="26" height="36" rx="3" fill="none" stroke="#FFD700" stroke-width="3"/><line x1="41" y1="20" x2="58" y2="13" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/><rect x="57" y="10" width="14" height="22" rx="3" fill="#FFD700"/><rect x="20" y="32" width="16" height="10" rx="2" fill="#FFD700"/></svg>`,
+    opts: ["Engine coolant level is low", "Engine management system fault detected", "Fuel level is very low – refuel soon", "Battery is not charging"],
+    ans: 2,
+    exp: "The fuel pump symbol warns that the fuel tank is nearly empty. Refuel as soon as possible to avoid running out."
+  },
+
+  {
+    topic: "Dashboard & Controls - Visual",
+    q: "This red indicator is lit when you start driving. What does it mean?",
+    svg: `<svg viewBox="0 0 110 65" xmlns="http://www.w3.org/2000/svg" width="165" height="98"><rect x="0" y="0" width="110" height="65" rx="8" fill="#111"/><circle cx="55" cy="32" r="24" fill="none" stroke="#CC0000" stroke-width="3.5"/><text x="55" y="28" text-anchor="middle" font-size="17" fill="#CC0000" font-weight="bold" font-family="Arial">!</text><text x="55" y="43" text-anchor="middle" font-size="15" fill="#CC0000" font-weight="bold" font-family="Arial">P</text></svg>`,
+    opts: ["A door is not fully closed", "The handbrake (parking brake) is still applied – release it before driving", "Low tyre pressure warning", "Battery is not charging"],
+    ans: 1,
+    exp: "The parking brake indicator (! in a circle with P) means the handbrake is still engaged. Release it before moving off."
+  },
+
+  {
+    topic: "Dashboard & Controls - Visual",
+    q: "This amber symbol appears on your dashboard. What should you do?",
+    svg: `<svg viewBox="0 0 110 65" xmlns="http://www.w3.org/2000/svg" width="165" height="98"><rect x="0" y="0" width="110" height="65" rx="8" fill="#111"/><rect x="24" y="17" width="38" height="22" rx="2" fill="none" stroke="#FFD700" stroke-width="2.5"/><rect x="34" y="11" width="8" height="7" rx="1" fill="none" stroke="#FFD700" stroke-width="2.5"/><rect x="46" y="11" width="8" height="7" rx="1" fill="none" stroke="#FFD700" stroke-width="2.5"/><rect x="16" y="22" width="9" height="11" rx="1" fill="none" stroke="#FFD700" stroke-width="2.5"/><rect x="61" y="22" width="11" height="11" rx="1" fill="none" stroke="#FFD700" stroke-width="2.5"/><rect x="33" y="38" width="8" height="7" rx="1" fill="none" stroke="#FFD700" stroke-width="2.5"/><rect x="45" y="38" width="8" height="7" rx="1" fill="none" stroke="#FFD700" stroke-width="2.5"/></svg>`,
+    opts: ["Ignore it – it is a service reminder only", "Have the vehicle inspected – the engine management system has detected a fault", "Change gear to reduce engine load", "Switch off air-conditioning to reduce strain"],
+    ans: 1,
+    exp: "The engine check light (engine outline symbol) means the engine management system has detected a fault. Have the vehicle inspected by a qualified mechanic."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this sign indicate, and who may use this lane during restricted hours?",
+    svg: `<svg viewBox="0 0 200 90" xmlns="http://www.w3.org/2000/svg" width="240" height="108"><rect x="2" y="2" width="196" height="86" rx="6" fill="white" stroke="#1a1a1a" stroke-width="3"/><text x="100" y="38" text-anchor="middle" font-size="22" fill="#1a1a1a" font-weight="bold" font-family="Arial,sans-serif">BUS LANE</text><line x1="18" y1="58" x2="182" y2="58" stroke="#FFD700" stroke-width="9"/><line x1="18" y1="72" x2="46" y2="72" stroke="#555" stroke-width="3"/><line x1="66" y1="72" x2="94" y2="72" stroke="#555" stroke-width="3"/><line x1="114" y1="72" x2="142" y2="72" stroke="#555" stroke-width="3"/><line x1="162" y1="72" x2="182" y2="72" stroke="#555" stroke-width="3"/></svg>`,
+    opts: ["All vehicles must use this lane during peak hours", "Only buses, bicycles, emergency and police vehicles may use it during restricted hours", "Taxis and buses only", "Heavy vehicles must keep to this lane"],
+    ans: 1,
+    exp: "The Bus Lane sign means only omnibuses (scheduled buses), bicycles, emergency and police vehicles may use the lane during restricted hours."
+  },
+
+  {
+    topic: "Traffic Signs - Visual",
+    q: "What does this information sign mean?",
+    svg: `<svg viewBox="0 0 200 90" xmlns="http://www.w3.org/2000/svg" width="240" height="108"><rect x="2" y="2" width="196" height="86" rx="6" fill="#1565C0"/><text x="100" y="34" text-anchor="middle" font-size="16" fill="white" font-weight="bold" font-family="Arial,sans-serif">ONE-WAY</text><line x1="24" y1="58" x2="168" y2="58" stroke="white" stroke-width="10" stroke-linecap="round"/><polyline points="148,42 168,58 148,74" stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
+    opts: ["Ahead only – no turns permitted", "This is a one-way street – all vehicles travel in the direction of the arrow only", "Two-way road begins here", "Turn left at end of road"],
+    ans: 1,
+    exp: "The One-Way sign (blue rectangle with white arrow) means this is a one-way street. Vehicles must travel in the indicated direction only."
+  },
+
+  {
+    topic: "Part III - Traffic Rules & Regulations",
+    q: "What is the approximate total stopping distance at 80 km/h on a dry road?",
+    opts: ["44 metres", "58 metres", "76 metres", "93 metres"],
+    ans: 2,
+    exp: "At 80 km/h: reaction distance approximately 22m + braking distance approximately 54m = total stopping distance approximately 76 metres."
+  },
+
+  {
+    topic: "Part III - Traffic Rules & Regulations",
+    q: "What is the approximate total stopping distance at 100 km/h on a dry road?",
+    opts: ["76 metres", "93 metres", "112 metres", "130 metres"],
+    ans: 2,
+    exp: "At 100 km/h: reaction distance approximately 28m + braking distance approximately 84m = total stopping distance approximately 112 metres."
+  },
+
+  {
+    topic: "Part III - Traffic Rules & Regulations",
+    q: "What is the approximate total stopping distance at 30 km/h on a dry road?",
+    opts: ["9 metres", "15 metres", "22 metres", "32 metres"],
+    ans: 1,
+    exp: "At 30 km/h: reaction distance approximately 9m + braking distance approximately 6m = total stopping distance approximately 15 metres."
+  },
+
+  {
+    topic: "Part III - Traffic Rules & Regulations",
+    q: "According to the 12-step overtaking procedure, what is Step 1?",
+    opts: ["Check traffic behind", "Signal right", "Check blind spot", "Check traffic ahead"],
+    ans: 3,
+    exp: "The 12-step overtaking procedure starts: 1 Check Traffic Ahead, 2 Check Traffic Behind, 3 Signal Right, 4 Check Blind Spot, 5 Move Right, 6 Accelerate..."
+  },
+
+  {
+    topic: "Part III - Traffic Rules & Regulations",
+    q: "According to the 12-step overtaking procedure, after Accelerating (Step 6), what are the next two steps?",
+    opts: ["Signal left, then move left", "Tap horn if necessary, then check mirror", "Check blind spot again, then accelerate more", "Cancel signal, then resume normal speed"],
+    ans: 1,
+    exp: "Steps 7 and 8 are: 7 Tap Horn (if necessary), 8 Check Mirror – before signalling left and moving back to the left."
+  },
+
+  {
+    topic: "Part III - Traffic Rules & Regulations",
+    q: "The minimum floor space per seated worker on a lorry open deck is:",
+    opts: ["0.186 sq metres", "0.372 sq metres (4 sq feet)", "0.5 sq metres", "1.0 sq metre"],
+    ans: 1,
+    exp: "The minimum deck space requirement is 0.372 square metres (or 4 square feet) per seated worker on the open deck of a lorry."
+  },
+
+  {
+    topic: "Part III - Traffic Rules & Regulations",
+    q: "The maximum allowable height of a seated worker on a lorry open deck, measured from the carriage deck, is:",
+    opts: ["0.9 metres", "1.0 metres", "1.1 metres", "1.35 metres"],
+    ans: 2,
+    exp: "The maximum allowable height of a seated worker shall not exceed 1.1 metres measured from the carriage deck."
+  },
+
+  {
+    topic: "Part III - Traffic Rules & Regulations",
+    q: "The front passenger seat in a lorry cabin must be occupied before workers can be:",
+    opts: ["Seated in the driver cab", "Carried on the rear carriage deck", "Given a safety briefing", "Allocated an MPC label"],
+    ans: 1,
+    exp: "The front passenger seat(s) in the lorry cabin must be occupied before any workers can be carried on the rear carriage deck."
+  },
+
+  {
+    topic: "Part III - Traffic Rules & Regulations",
+    q: "You must not park within how many metres of a fire hydrant?",
+    opts: ["1.5 metres", "3 metres on either side", "6 metres", "9 metres"],
+    ans: 1,
+    exp: "Do not park within 3 metres (10 feet) on either side of a fire hydrant."
+  },
+
+  {
+    topic: "Part III - Traffic Rules & Regulations",
+    q: "When parking on a downhill slope (manual transmission), you should put the car into:",
+    opts: ["Neutral", "First (low) gear", "Reverse gear", "Any gear with handbrake"],
+    ans: 2,
+    exp: "Facing downhill, put the car into reverse gear. Facing uphill, use low (first) gear. This prevents rolling if the handbrake fails."
+  },
+
+  {
+    topic: "Part IV - Code of Conduct",
+    q: "Motorcyclists are legally required to switch on their headlights:",
+    opts: ["Only at night between 7pm and 7am", "Only in rain or poor visibility", "Throughout the day at all times", "Only on expressways"],
+    ans: 2,
+    exp: "Motorcyclists are required by law to switch on their headlights throughout the day at all times."
+  },
+
+  {
+    topic: "Part IV - Code of Conduct",
+    q: "The average range of a vehicle headlight on high beam is approximately:",
+    opts: ["50 metres", "75 metres", "100 metres", "150 metres"],
+    ans: 2,
+    exp: "The average headlight on high beam illuminates approximately 100 metres ahead. It is safer not to out-drive this range."
+  },
+
+  {
+    topic: "Part IV - Code of Conduct",
+    q: "On open highways in strong cross-winds you should:",
+    opts: ["Increase speed to reach shelter faster", "Reduce speed and maintain a firm grip on the steering wheel", "Move to the right lane for more space", "Switch on hazard lights at normal speed"],
+    ans: 1,
+    exp: "Stretches of open highway are exposed to strong cross-winds. Reduce speed and keep a firm grip on the steering wheel."
+  },
+
+  {
+    topic: "Part IV - Code of Conduct",
+    q: "When passing through a passable flooded road, you should:",
+    opts: ["Accelerate to get through quickly", "Engage a lower gear and drive slowly through", "Switch off the engine to prevent damage", "Use the highest gear to maintain momentum"],
+    ans: 1,
+    exp: "When passing through a passable flood, engage a lower gear and drive slowly through it. After passing, pump the brakes to dry them."
+  },
+
+  {
+    topic: "Part IV - Code of Conduct",
+    q: "It is unsafe to drive with the interior lights on at night because:",
+    opts: ["It wastes battery power unnecessarily", "It reduces your external visibility", "It is always illegal to use interior lights while driving", "It distracts oncoming drivers"],
+    ans: 1,
+    exp: "Interior lights on at night reduce your external visibility, making it harder to see the road and surroundings clearly."
+  },
+
+  {
+    topic: "Part IV - Code of Conduct",
+    q: "When changing lanes, you check blind spots by:",
+    opts: ["Using only the rear-view mirror", "Relying on both wing mirrors", "Turning your head and looking over your shoulder", "Sounding the horn to warn other vehicles"],
+    ans: 2,
+    exp: "Blind spots cannot be seen in mirrors. You must physically turn your head and look over your shoulder before changing lane, overtaking, turning or stopping."
+  },
+
+  {
+    topic: "Part IV - Code of Conduct",
+    q: "If your wheels lock during emergency braking on a wet road, you should:",
+    opts: ["Keep brakes fully applied and steer hard away from the skid", "Quickly release the brake pedal, then apply intermittent (on/off) braking", "Apply the handbrake to regain control", "Accelerate slightly to get traction back"],
+    ans: 1,
+    exp: "If wheels lock, quickly release the brake pedal then apply intermittent braking. Keeping wheels locked loses steering control and causes the vehicle to skid."
+  },
+
+  {
+    topic: "Part V - Parts & Controls of a Car",
+    q: "What does the Tripmeter (trip odometer) on the dashboard measure?",
+    opts: ["Total engine hours since last service", "Distance travelled since it was last reset", "Engine RPM", "Instantaneous fuel consumption"],
+    ans: 1,
+    exp: "The Tripmeter measures the distance travelled since it was last reset, useful for tracking individual trip distances."
+  },
+
+  {
+    topic: "Part V - Parts & Controls of a Car",
+    q: "What does the Temperature Gauge on the dashboard indicate?",
+    opts: ["Tyre temperature", "Outside air temperature", "Engine coolant temperature", "Engine oil temperature"],
+    ans: 2,
+    exp: "The Temperature Gauge shows the engine coolant temperature, warning of potential overheating."
+  },
+
+  {
+    topic: "Part V - Parts & Controls of a Car",
+    q: "Before opening the radiator cap, you must ensure:",
+    opts: ["The engine has been running at least 10 minutes to warm up", "The engine is completely cool – coolant is highly pressurised when hot", "The vehicle is in Park or Neutral", "The fuel tank is full"],
+    ans: 1,
+    exp: "Always ensure the engine is completely cool before opening the radiator cap. Hot coolant is highly pressurised and can cause severe scalding burns."
+  },
+
+  {
+    topic: "Part VI/VII - Work Zones & School Zones",
+    q: "Work zone warning signs are coloured:",
+    opts: ["Red and white", "Blue and white", "Orange", "Yellow and black"],
+    ans: 2,
+    exp: "Work zone signs are orange-coloured, used to warn road users of construction activity and temporary hazards ahead."
+  },
+
+  {
+    topic: "Part VI/VII - Work Zones & School Zones",
+    q: "At a work zone you must NOT:",
+    opts: ["Slow down below the posted temporary speed limit", "Switch lanes to overtake queuing traffic or drive through cone/barrier-marked areas", "Check mirrors before changing lanes", "Sound horn in an emergency"],
+    ans: 1,
+    exp: "At work zones, do not switch lanes to overtake queuing traffic or enter areas marked off by traffic cones or barriers."
+  },
+
+  {
+    topic: "Part VIII - Driving in Tunnels",
+    q: "Which of these is a tunnel-specific rule (not a general road rule)?",
+    opts: ["Do not speed", "Do not make U-turns", "Do not alight from your vehicle unless in an emergency", "Do not stop unless lawfully required"],
+    ans: 2,
+    exp: "Not alighting from the vehicle unless in an emergency is a tunnel-specific rule. The others (no speeding, no U-turns, no unnecessary stops) are also existing general road rules."
+  },
+
+  {
+    topic: "Part IX/X - Security & Motor Claims",
+    q: "To reduce motorcycle theft, you should:",
+    opts: ["Park only in covered multi-storey car parks", "Secure the motorcycle with a strong U-lock and always remove the ignition key even when leaving briefly", "Leave the engine running briefly to deter thieves", "Park in a busy visible area without additional locking"],
+    ans: 1,
+    exp: "Always secure your motorcycle with a strong lock (such as a U-lock) and remove the ignition key whenever leaving it unattended, even for a short time."
+  },
+
+  {
+    topic: "Part I - Driving Licences",
+    q: "After a 3rd suspension under DIPS, what happens to the driving licence?",
+    opts: ["Suspended for 12 months then returned", "Suspended for 24 months", "Revoked – the driver must retake all tests to get a new licence", "Downgraded to probationary status"],
+    ans: 2,
+    exp: "Upon a 3rd suspension the driving licence is revoked. The driver must retake and pass all required theory and practical driving tests."
+  },
+
+  {
+    topic: "Part I - Driving Licences",
+    q: "A motorist with a clean driving record for 3 continuous years (and no insurance claims) enjoys:",
+    opts: ["No special benefits", "A discount over and above the usual No-Claim Bonus when renewing insurance", "Automatic upgrade to a higher licence class", "Free medical examination"],
+    ans: 1,
+    exp: "Motorists with a clean driving record for 3 continuous years can enjoy a discount over and above the usual No-Claim Bonus with participating insurers."
+  }
+
+,
+
+  {
+    topic: "Blind Spots & Road Safety",
+    q: "To check 'blind spot' when driving, you must",
+    opts: ["Turn your head and look over your shoulder.", "Turn your head and look into the wing mirrors.", "Turn your head and look into the rear-view mirror."],
+    ans: 0,
+    exp: "Answer: A) Turn your head and look over your shoulder."
+  },
+
+  {
+    topic: "Blind Spots & Road Safety",
+    q: "Before changing lanes, you should check your blind spots by",
+    opts: ["Looking into the rear view mirror.", "Looking over your shoulder.", "Looking at the side mirrors."],
+    ans: 1,
+    exp: "Answer: B) Looking over your shoulder."
+  },
+
+  {
+    topic: "Blind Spots & Road Safety",
+    q: "'Blind spots' of a vehicle is an area which cannot be viewed by",
+    opts: ["the rear view mirror.", "left and right wing mirrors.", "both the rear view mirror and wing mirrors."],
+    ans: 2,
+    exp: "Answer: C) Both the rear view mirror and wing mirrors."
+  },
+
+  {
+    topic: "Blind Spots & Road Safety",
+    q: "Motorcyclists often look over their right shoulder just before turning right. This is because",
+    opts: ["they need to listen for following traffic.", "they need to check for traffic in their blind spot.", "it is a legal requirement for motorcyclists."],
+    ans: 1,
+    exp: "Answer: B) They need to check for traffic in their blind spot."
+  },
+
+  {
+    topic: "Blind Spots & Road Safety",
+    q: "Which of the following is the best way to reduce the risk of being in a blind spot of a large vehicle?",
+    opts: ["Stay very close behind the vehicle.", "Avoid travelling alongside large vehicles for long periods.", "Always travel in the lane to the right of the large vehicle."],
+    ans: 1,
+    exp: "Answer: B) Avoid travelling alongside large vehicles for long periods."
+  },
+
+  {
+    topic: "Blind Spots & Road Safety",
+    q: "What should you do if you cannot avoid being in the blind spot of a large vehicle?",
+    opts: ["Sound your horn to alert the driver.", "Flash your headlights.", "Pass through the blind spot as quickly and safely as possible."],
+    ans: 2,
+    exp: "Answer: C) Pass through the blind spot as quickly and safely as possible."
+  },
+
+  {
+    topic: "Blind Spots & Road Safety",
+    q: "When a large vehicle is making a wide turn, you should",
+    opts: ["Try to squeeze through the gap.", "Wait patiently and not attempt to overtake.", "Sound your horn to warn the driver."],
+    ans: 1,
+    exp: "Answer: B) Wait patiently and not attempt to overtake."
+  },
+
+  {
+    topic: "Blind Spots & Road Safety",
+    q: "The recommended following distance on a dry road at 70 km/h is",
+    opts: ["At least 2 seconds.", "At least 3 seconds.", "At least 4 seconds."],
+    ans: 0,
+    exp: "Answer: A) At least 2 seconds."
+  },
+
+  {
+    topic: "Blind Spots & Road Safety",
+    q: "What is the primary purpose of the 2-second rule?",
+    opts: ["To maintain a safe following distance.", "To allow for lane changes.", "To keep within the speed limit."],
+    ans: 0,
+    exp: "Answer: A) To maintain a safe following distance."
+  },
+
+  {
+    topic: "Blind Spots & Road Safety",
+    q: "In wet weather conditions, the safe following distance should be",
+    opts: ["The same as in dry conditions.", "Doubled to at least 4 seconds.", "Reduced as your brakes work better."],
+    ans: 1,
+    exp: "Answer: B) Doubled to at least 4 seconds."
+  },
+
+  {
+    topic: "Blind Spots & Road Safety",
+    q: "What does tailgating mean?",
+    opts: ["Driving too closely behind another vehicle.", "Overtaking on the left.", "Using high beam headlights."],
+    ans: 0,
+    exp: "Answer: A) Driving too closely behind another vehicle."
+  },
+
+  {
+    topic: "Blind Spots & Road Safety",
+    q: "Which of the following is NOT a reason for maintaining a safe following distance?",
+    opts: ["To have time to react and stop.", "To protect yourself from the vehicle in front braking suddenly.", "To allow you to overtake more easily."],
+    ans: 2,
+    exp: "Answer: C) To allow you to overtake more easily."
+  },
+
+  {
+    topic: "Blind Spots & Road Safety",
+    q: "Defensive driving means",
+    opts: ["Driving aggressively to protect your right of way.", "Anticipating hazards and being prepared to react safely.", "Always driving below the speed limit."],
+    ans: 1,
+    exp: "Answer: B) Anticipating hazards and being prepared to react safely."
+  },
+
+  {
+    topic: "Blind Spots & Road Safety",
+    q: "When should you use your horn?",
+    opts: ["To greet other drivers.", "Only when necessary to warn others of danger.", "Whenever you are frustrated with other drivers."],
+    ans: 1,
+    exp: "Answer: B) Only when necessary to warn others of danger."
+  },
+
+  {
+    topic: "Blind Spots & Road Safety",
+    q: "What should you do when you see an emergency vehicle with its siren on approaching from behind?",
+    opts: ["Speed up to get out of the way quickly.", "Pull over to the left safely and let it pass.", "Stay in your lane and maintain your speed."],
+    ans: 1,
+    exp: "Answer: B) Pull over to the left safely and let it pass."
+  },
+
+  {
+    topic: "Ambulance / Bus Lane / Zig Zag Lines",
+    q: "When you hear a siren from an emergency vehicle, you must",
+    opts: ["Speed up and get out of the way.", "Pull over to the left and stop if necessary to let it pass.", "Continue at the same speed."],
+    ans: 1,
+    exp: "Answer: B) Pull over to the left and stop if necessary to let it pass."
+  },
+
+  {
+    topic: "Ambulance / Bus Lane / Zig Zag Lines",
+    q: "You should give way to an ambulance",
+    opts: ["Only when it is using its flashing lights.", "Only when it is using its siren.", "When it is using its flashing lights and/or siren."],
+    ans: 2,
+    exp: "Answer: C) When it is using its flashing lights and/or siren."
+  },
+
+  {
+    topic: "Ambulance / Bus Lane / Zig Zag Lines",
+    q: "During bus lane restricted hours, which vehicles may use the bus lane?",
+    opts: ["Taxis and motorcycles.", "Buses, bicycles, and emergency vehicles.", "All vehicles when the lane is empty."],
+    ans: 1,
+    exp: "Answer: B) Buses, bicycles, and emergency vehicles."
+  },
+
+  {
+    topic: "Ambulance / Bus Lane / Zig Zag Lines",
+    q: "You can drive on the bus lane",
+    opts: ["when all other lanes are occupied.", "outside the restricted hours.", "when passing another vehicle on the left."],
+    ans: 1,
+    exp: "Answer: B) Outside the restricted hours."
+  },
+
+  {
+    topic: "Ambulance / Bus Lane / Zig Zag Lines",
+    q: "What do double yellow zig-zag lines along the side of a road mean?",
+    opts: ["No parking at any time.", "No stopping at any time.", "No parking during restricted hours."],
+    ans: 1,
+    exp: "Answer: B) No stopping at any time."
+  },
+
+  {
+    topic: "Ambulance / Bus Lane / Zig Zag Lines",
+    q: "What do single yellow zig-zag lines mean?",
+    opts: ["No stopping at any time.", "No parking at any time, except to pick up or set down passengers.", "No parking during peak hours only."],
+    ans: 1,
+    exp: "Answer: B) No parking at any time, except to pick up or set down passengers."
+  },
+
+  {
+    topic: "Ambulance / Bus Lane / Zig Zag Lines",
+    q: "Zig-zag lines near a pedestrian crossing mean you must not",
+    opts: ["sound your horn.", "park or overtake the leading vehicle.", "use your headlights."],
+    ans: 1,
+    exp: "Answer: B) Park or overtake the leading vehicle."
+  },
+
+  {
+    topic: "Ambulance / Bus Lane / Zig Zag Lines",
+    q: "What is the purpose of zig-zag lines near a school crossing?",
+    opts: ["To indicate a school zone speed limit.", "To prohibit parking and overtaking to ensure children's safety.", "To warn drivers of children crossing."],
+    ans: 1,
+    exp: "Answer: B) To prohibit parking and overtaking to ensure children's safety."
+  },
+
+  {
+    topic: "Right Lane & Traffic Lights",
+    q: "When can you use the right lane of a two-lane carriageway?",
+    opts: ["When your path of travel is obstructed by road works or parked vehicles.", "When your speed is higher than the speed limit for the road.", "When the right lane is free of traffic."],
+    ans: 0,
+    exp: "Answer: A) When your path of travel is obstructed by road works or parked vehicles."
+  },
+
+  {
+    topic: "Right Lane & Traffic Lights",
+    q: "You may drive along the right-most lane when",
+    opts: ["You are travelling at the speed limit.", "The traffic is not heavy.", "You are overtaking another vehicle."],
+    ans: 2,
+    exp: "Answer: C) You are overtaking another vehicle."
+  },
+
+  {
+    topic: "Right Lane & Traffic Lights",
+    q: "Road hogging",
+    opts: ["Ensures a smoother flow of traffic.", "Causes inconvenience and danger to other road users.", "Is only an offence on expressways."],
+    ans: 1,
+    exp: "Answer: B) Causes inconvenience and danger to other road users."
+  },
+
+  {
+    topic: "Right Lane & Traffic Lights",
+    q: "What should you do after overtaking on a two-lane road?",
+    opts: ["Stay in the right lane if it is clear.", "Return to the left lane as soon as it is safe.", "Signal left before returning to the left lane only on expressways."],
+    ans: 1,
+    exp: "Answer: B) Return to the left lane as soon as it is safe."
+  },
+
+  {
+    topic: "Right Lane & Traffic Lights",
+    q: "When the traffic light turns green, you should",
+    opts: ["Move off immediately.", "Check that the junction is clear before proceeding.", "Sound your horn to alert pedestrians."],
+    ans: 1,
+    exp: "Answer: B) Check that the junction is clear before proceeding."
+  },
+
+  {
+    topic: "Right Lane & Traffic Lights",
+    q: "A flashing green light at a traffic junction means",
+    opts: ["You may proceed with caution.", "The light is about to change to amber – be prepared to stop.", "Pedestrians have right of way."],
+    ans: 1,
+    exp: "Answer: B) The light is about to change to amber – be prepared to stop."
+  },
+
+  {
+    topic: "Right Lane & Traffic Lights",
+    q: "When you see a red light with a green arrow, you must",
+    opts: ["Wait until the main light turns green before going in the direction of the arrow.", "Proceed only in the direction of the arrow, giving way to other traffic.", "Stop completely regardless of the arrow."],
+    ans: 1,
+    exp: "Answer: B) Proceed only in the direction of the arrow, giving way to other traffic."
+  },
+
+  {
+    topic: "Right Lane & Traffic Lights",
+    q: "At a junction with traffic lights, a red light means",
+    opts: ["Slow down and give way.", "Stop behind the stop line and wait.", "Stop only if there is oncoming traffic."],
+    ans: 1,
+    exp: "Answer: B) Stop behind the stop line and wait."
+  },
+
+  {
+    topic: "Right Lane & Traffic Lights",
+    q: "When should you NOT enter a junction even if the light is green?",
+    opts: ["When it is raining heavily.", "When you cannot clear the junction without blocking traffic.", "When pedestrians are crossing."],
+    ans: 1,
+    exp: "Answer: B) When you cannot clear the junction without blocking traffic."
+  },
+
+  {
+    topic: "Right Lane & Traffic Lights",
+    q: "An amber traffic light means",
+    opts: ["Speed up to clear the junction.", "Stop if you can do so safely.", "Give way to pedestrians only."],
+    ans: 1,
+    exp: "Answer: B) Stop if you can do so safely."
+  },
+
+  {
+    topic: "Lane Discipline & Overtaking",
+    q: "When should you NOT overtake?",
+    opts: ["When the vehicle in front is travelling slowly.", "When approaching a bend, hill crest, or pedestrian crossing.", "When the right lane is clear."],
+    ans: 1,
+    exp: "Answer: B) When approaching a bend, hill crest, or pedestrian crossing."
+  },
+
+  {
+    topic: "Lane Discipline & Overtaking",
+    q: "You must not cross the centre line at bends because",
+    opts: ["It is illegal to cross the centre line at any time.", "You cannot see oncoming traffic clearly.", "It slows down traffic flow."],
+    ans: 1,
+    exp: "Answer: B) You cannot see oncoming traffic clearly."
+  },
+
+  {
+    topic: "Lane Discipline & Overtaking",
+    q: "When turning right at a one-way street, you should position your vehicle",
+    opts: ["In the right hand lane.", "Just left of the centre of the road.", "In any lane depending on traffic conditions."],
+    ans: 0,
+    exp: "Answer: A) In the right hand lane."
+  },
+
+  {
+    topic: "Lane Discipline & Overtaking",
+    q: "You are driving on a three-lane carriageway at 80 km/h. There is no traffic ahead. Which lane should you use?",
+    opts: ["Any lane.", "Middle lane.", "Left lane."],
+    ans: 2,
+    exp: "Answer: C) Left lane."
+  },
+
+  {
+    topic: "Lane Discipline & Overtaking",
+    q: "You may overtake another vehicle on the left",
+    opts: ["If it is a heavy vehicle.", "If the driver in front signals his intention to turn right.", "If you are certain that the vehicle would not change direction."],
+    ans: 1,
+    exp: "Answer: B) If the driver in front signals his intention to turn right."
+  },
+
+  {
+    topic: "Lane Discipline & Overtaking",
+    q: "When should you start to keep left after overtaking?",
+    opts: ["As soon as you have passed the vehicle.", "When the vehicle you have overtaken is visible in your rear-view mirror.", "After signalling left for at least 3 seconds."],
+    ans: 1,
+    exp: "Answer: B) When the vehicle you have overtaken is visible in your rear-view mirror."
+  },
+
+  {
+    topic: "Lane Discipline & Overtaking",
+    q: "Before overtaking, you should",
+    opts: ["Sound your horn to warn the vehicle ahead.", "Check mirrors, signal, check blind spot, and ensure the road ahead is clear.", "Flash your headlights at the vehicle in front."],
+    ans: 1,
+    exp: "Answer: B) Check mirrors, signal, check blind spot, and ensure the road ahead is clear."
+  },
+
+  {
+    topic: "Lane Discipline & Overtaking",
+    q: "What is the safest lane position on a multi-lane road when not overtaking?",
+    opts: ["The rightmost lane.", "The centre lane.", "The leftmost lane."],
+    ans: 2,
+    exp: "Answer: C) The leftmost lane."
+  },
+
+  {
+    topic: "Lane Discipline & Overtaking",
+    q: "When changing lanes, you must",
+    opts: ["Only check the mirrors.", "Signal, check mirrors and blind spots, then change lane when safe.", "Change lanes quickly to minimise disruption."],
+    ans: 1,
+    exp: "Answer: B) Signal, check mirrors and blind spots, then change lane when safe."
+  },
+
+  {
+    topic: "Lane Discipline & Overtaking",
+    q: "At a roundabout, you must give way to",
+    opts: ["Traffic on your left.", "Traffic already in the roundabout on your right.", "Traffic entering the roundabout at the same time."],
+    ans: 1,
+    exp: "Answer: B) Traffic already in the roundabout on your right."
+  },
+
+  {
+    topic: "Rules and Regulations",
+    q: "A tyre needs to be changed when",
+    opts: ["It is two years old.", "The depth of its tread is less than 1.6 mm.", "It is completely bald."],
+    ans: 1,
+    exp: "Answer: B) The depth of its tread is less than 1.6 mm."
+  },
+
+  {
+    topic: "Rules and Regulations",
+    q: "The minimum age requirement for applying for a Basic Theory Test is",
+    opts: ["16 years.", "17 years.", "18 years."],
+    ans: 2,
+    exp: "Answer: C) 18 years."
+  },
+
+  {
+    topic: "Rules and Regulations",
+    q: "Unless otherwise stated, the maximum speed limit on all roads in Singapore is",
+    opts: ["50 km/h.", "60 km/h.", "80 km/h."],
+    ans: 0,
+    exp: "Answer: A) 50 km/h."
+  },
+
+  {
+    topic: "Rules and Regulations",
+    q: "When driving in the rain, you should",
+    opts: ["Drive faster to get home.", "Reduce your speed.", "Drive at normal speed."],
+    ans: 1,
+    exp: "Answer: B) Reduce your speed."
+  },
+
+  {
+    topic: "Rules and Regulations",
+    q: "When driving past pedestrians on the road, you should",
+    opts: ["Sound your horn to warn them.", "Slow down and give them plenty of room.", "Flash your headlights."],
+    ans: 1,
+    exp: "Answer: B) Slow down and give them plenty of room."
+  },
+
+  {
+    topic: "Rules and Regulations",
+    q: "When must you use your headlights?",
+    opts: ["Only at night.", "When visibility is reduced, including rain and fog.", "Only in tunnels."],
+    ans: 1,
+    exp: "Answer: B) When visibility is reduced, including rain and fog."
+  },
+
+  {
+    topic: "Rules and Regulations",
+    q: "What is the speed limit on an expressway in Singapore unless otherwise stated?",
+    opts: ["80 km/h.", "90 km/h.", "100 km/h."],
+    ans: 2,
+    exp: "Answer: C) 100 km/h. (90 km/h for motorcycles)"
+  },
+
+  {
+    topic: "Rules and Regulations",
+    q: "You must not use a mobile phone while driving unless",
+    opts: ["You are at a red light.", "You are using a hands-free device.", "The call is brief."],
+    ans: 1,
+    exp: "Answer: B) You are using a hands-free device."
+  },
+
+  {
+    topic: "Rules and Regulations",
+    q: "Which of the following must you do at a Give Way line?",
+    opts: ["Stop completely before proceeding.", "Give way to traffic on the major road.", "Flash headlights before proceeding."],
+    ans: 1,
+    exp: "Answer: B) Give way to traffic on the major road."
+  },
+
+  {
+    topic: "Rules and Regulations",
+    q: "What is the demerit point threshold at which a driving licence is suspended for a new driver?",
+    opts: ["12 points.", "13 points.", "24 points."],
+    ans: 0,
+    exp: "Answer: A) 12 points within 12 months for new (probationary) drivers."
+  },
+
+  {
+    topic: "Rules and Regulations",
+    q: "How long is a driving licence suspended after accumulating 24 or more demerit points for a regular driver?",
+    opts: ["1 month.", "2 months.", "3 months."],
+    ans: 2,
+    exp: "Answer: C) 3 months for a first suspension at 24 demerit points."
+  },
+
+  {
+    topic: "Rules and Regulations",
+    q: "When parking on an uphill gradient (manual car), the front wheels should be turned",
+    opts: ["Towards the kerb.", "Away from the kerb.", "Straight ahead."],
+    ans: 1,
+    exp: "Answer: B) Away from the kerb, so if brakes fail the car rolls into the kerb."
+  },
+
+  {
+    topic: "Rules and Regulations",
+    q: "What is the minimum tread depth required for a tyre in Singapore?",
+    opts: ["1 mm.", "1.6 mm.", "2 mm."],
+    ans: 1,
+    exp: "Answer: B) 1.6 mm."
+  },
+
+  {
+    topic: "Alcohol & Road Safety",
+    q: "The legal blood alcohol limit for drivers in Singapore is",
+    opts: ["35 micrograms of alcohol per 100 ml of breath.", "80 mg of alcohol per 100 ml of blood.", "Both A and B are correct legal limits."],
+    ans: 2,
+    exp: "Answer: C) Both A (breath) and B (blood) are the correct legal limits."
+  },
+
+  {
+    topic: "Alcohol & Road Safety",
+    q: "Which of the following is true about drinking and driving?",
+    opts: ["Alcohol makes you a more confident and better driver.", "Alcohol has no effect on the way you drive.", "Alcohol slows down your reactions when driving."],
+    ans: 2,
+    exp: "Answer: C) Alcohol slows down your reactions when driving."
+  },
+
+  {
+    topic: "Alcohol & Road Safety",
+    q: "Which of the following statements about alcohol is true?",
+    opts: ["You may decline a breath or blood test.", "Alcohol will not be detected by a breath test after eating peppermints.", "Even a small amount of alcohol tends to increase the chance of an accident."],
+    ans: 2,
+    exp: "Answer: C) Even a small amount of alcohol tends to increase the chance of an accident."
+  },
+
+  {
+    topic: "Alcohol & Road Safety",
+    q: "Which of these can affect your reaction time?",
+    opts: ["Drugs.", "Contact lenses.", "Tinted windows."],
+    ans: 0,
+    exp: "Answer: A) Drugs."
+  },
+
+  {
+    topic: "Alcohol & Road Safety",
+    q: "If you are caught drink-driving for the first offence, you may face",
+    opts: ["A fine only.", "Imprisonment only.", "A fine and/or imprisonment, and disqualification from driving."],
+    ans: 2,
+    exp: "Answer: C) A fine and/or imprisonment, plus disqualification from driving."
+  },
+
+  {
+    topic: "Alcohol & Road Safety",
+    q: "Fatigue while driving is dangerous because",
+    opts: ["It increases your confidence.", "It reduces your reaction time and alertness.", "It only affects older drivers."],
+    ans: 1,
+    exp: "Answer: B) It reduces your reaction time and alertness."
+  },
+
+  {
+    topic: "Alcohol & Road Safety",
+    q: "What should you do if you feel drowsy while driving?",
+    opts: ["Open the window for fresh air and continue.", "Turn up the radio to stay awake.", "Stop at a safe place and rest."],
+    ans: 2,
+    exp: "Answer: C) Stop at a safe place and rest."
+  },
+
+  {
+    topic: "Alcohol & Road Safety",
+    q: "Which of the following can impair your driving ability?",
+    opts: ["Alcohol.", "Certain prescription medications.", "Both alcohol and certain medications."],
+    ans: 2,
+    exp: "Answer: C) Both alcohol and certain medications can impair driving."
+  },
+
+  {
+    topic: "Seat Belt & 2-Second Rule",
+    q: "A passenger is exempted from wearing a seat belt if he is below",
+    opts: ["1.7 metres in height.", "1.6 metres in height.", "1.5 metres in height."],
+    ans: 2,
+    exp: "Answer: C) 1.5 metres in height."
+  },
+
+  {
+    topic: "Seat Belt & 2-Second Rule",
+    q: "Who is responsible for ensuring that passengers below 14 years old wear a seat belt?",
+    opts: ["The passenger themselves.", "The driver.", "The parent or guardian only."],
+    ans: 1,
+    exp: "Answer: B) The driver is responsible for ensuring passengers below 14 wear seat belts."
+  },
+
+  {
+    topic: "Seat Belt & 2-Second Rule",
+    q: "When must a driver wear a seat belt?",
+    opts: ["Only on expressways.", "At all times when the vehicle is in motion.", "Only when travelling above 50 km/h."],
+    ans: 1,
+    exp: "Answer: B) At all times when the vehicle is in motion."
+  },
+
+  {
+    topic: "Seat Belt & 2-Second Rule",
+    q: "The 2-second rule is used to",
+    opts: ["Judge when to overtake safely.", "Maintain a safe following distance.", "Estimate braking distance."],
+    ans: 1,
+    exp: "Answer: B) Maintain a safe following distance."
+  },
+
+  {
+    topic: "Seat Belt & 2-Second Rule",
+    q: "To apply the 2-second rule, when the vehicle ahead passes a fixed point, you should",
+    opts: ["Be at that point within 2 seconds.", "Not reach that point for at least 2 seconds.", "Flash your headlights after 2 seconds."],
+    ans: 1,
+    exp: "Answer: B) You should not reach that fixed point for at least 2 seconds."
+  },
+
+  {
+    topic: "Seat Belt & 2-Second Rule",
+    q: "In wet or slippery conditions, the 2-second following rule should be",
+    opts: ["Kept the same.", "Increased to at least 4 seconds.", "Reduced as you drive more slowly."],
+    ans: 1,
+    exp: "Answer: B) Increased to at least 4 seconds in wet or slippery conditions."
+  },
+
+  {
+    topic: "Seat Belt & 2-Second Rule",
+    q: "Seat belts save lives by",
+    opts: ["Preventing the vehicle from skidding.", "Stopping occupants from being thrown forward in a collision.", "Reducing the speed of impact."],
+    ans: 1,
+    exp: "Answer: B) Stopping occupants from being thrown forward in a collision."
+  },
+
+  {
+    topic: "Seat Belt & 2-Second Rule",
+    q: "Which of the following is NOT a valid exemption from wearing a seat belt?",
+    opts: ["A person with a medical certificate exempting them.", "A person reversing a vehicle.", "A person who finds it uncomfortable."],
+    ans: 2,
+    exp: "Answer: C) Discomfort is not a valid exemption from wearing a seat belt."
+  },
+
+  {
+    topic: "Flood & Headlights",
+    q: "When driving through a flooded road, you should",
+    opts: ["Accelerate to get through quickly.", "Engage a lower gear and drive slowly.", "Switch off the engine to prevent water intake."],
+    ans: 1,
+    exp: "Answer: B) Engage a lower gear and drive slowly through the flooded area."
+  },
+
+  {
+    topic: "Flood & Headlights",
+    q: "After driving through a flood, you should",
+    opts: ["Accelerate immediately to dry the brakes.", "Test and dry your brakes by pressing them gently several times.", "Avoid braking for the next few kilometres."],
+    ans: 1,
+    exp: "Answer: B) Test and dry your brakes by pressing them gently several times."
+  },
+
+  {
+    topic: "Flood & Headlights",
+    q: "If floodwater is too deep to cross safely, you should",
+    opts: ["Drive through slowly using 4WD mode.", "Turn back and find an alternative route.", "Wait until the flood subsides before crossing."],
+    ans: 1,
+    exp: "Answer: B) Turn back and find an alternative route."
+  },
+
+  {
+    topic: "Flood & Headlights",
+    q: "You must use your headlights",
+    opts: ["From 7pm to 7am only.", "Whenever visibility is seriously reduced.", "Only in tunnels and underpasses."],
+    ans: 1,
+    exp: "Answer: B) Whenever visibility is seriously reduced (rain, fog, etc.)."
+  },
+
+  {
+    topic: "Flood & Headlights",
+    q: "When should you use your fog lights?",
+    opts: ["Whenever it is raining.", "Only when visibility is severely reduced by fog, rain, or smoke.", "Every night as a safety measure."],
+    ans: 1,
+    exp: "Answer: B) Only when visibility is severely reduced by fog, rain, or smoke."
+  },
+
+  {
+    topic: "Flood & Headlights",
+    q: "When driving at night, you should switch from high beam to low beam",
+    opts: ["When entering a well-lit area or when an oncoming vehicle is within 200m.", "Only when flashed by another driver.", "When you are within 100m of the vehicle ahead."],
+    ans: 0,
+    exp: "Answer: A) When entering a well-lit area or when an oncoming vehicle is within 200m."
+  },
+
+  {
+    topic: "Flood & Headlights",
+    q: "High beam headlights should NOT be used",
+    opts: ["On poorly lit country roads.", "In heavy rain or fog as they reflect off water/fog and reduce visibility.", "When driving above 80 km/h."],
+    ans: 1,
+    exp: "Answer: B) High beams reflect off rain and fog, actually reducing visibility – use low beam instead."
+  },
+
+  {
+    topic: "Flood & Headlights",
+    q: "If your vehicle breaks down in a tunnel, you should",
+    opts: ["Stay in the vehicle and wait for help.", "Switch on hazard lights, exit safely, and call for help from an emergency phone.", "Try to push the vehicle to the exit."],
+    ans: 1,
+    exp: "Answer: B) Switch on hazard lights, exit safely, and use the emergency phone in the tunnel."
+  }
+
+];
+
+// ═══════════════════════════════════════════════════════════════
+//  APP STATE
+// ═══════════════════════════════════════════════════════════════
+const TOPICS = [...new Set(QUESTIONS.map(q => q.topic))];
+let activeQ     = [];
+let currentIdx  = 0;
+let correct     = 0;
+let answered    = 0;
+let history     = [];   // {q, chosen, ans}
+
+// ─── Build topic checkboxes ───────────────────────────────────
+const grid = document.getElementById('topic-grid');
+TOPICS.forEach(t => {
+  const id  = 'cb_' + t.replace(/\W+/g,'_');
+  const lbl = document.createElement('label');
+  lbl.innerHTML = `<input type="checkbox" id="${id}" value="${t}" checked> ${t}`;
+  grid.appendChild(lbl);
+});
+
+// ─── Start ────────────────────────────────────────────────────
+function startQuiz() {
+  const selected = [...document.querySelectorAll('#topic-grid input:checked')].map(cb => cb.value);
+  if (!selected.length) { alert('Please select at least one topic.'); return; }
+
+  let pool = QUESTIONS.filter(q => selected.includes(q.topic));
+  shuffle(pool);
+
+  const cnt = document.getElementById('q-count').value;
+  activeQ = cnt === 'all' ? pool : pool.slice(0, Math.min(+cnt, pool.length));
+
+  if (!activeQ.length) { alert('No questions available for selected topics.'); return; }
+
+  currentIdx = 0; correct = 0; answered = 0; history = [];
+  clearSave();
+
+  document.getElementById('start-screen').style.display  = 'none';
+  document.getElementById('quiz-screen').style.display   = 'block';
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('review-section').style.display= 'none';
+  renderQuestion();
+}
+
+// ─── Render current question ──────────────────────────────────
+function renderQuestion() {
+  const data = activeQ[currentIdx];
+  const total = activeQ.length;
+
+  const pct = ((currentIdx) / total * 100).toFixed(0);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-text').textContent  = `Question ${currentIdx + 1} of ${total}`;
+  document.getElementById('score-live').textContent = `Score: ${correct} / ${answered}`;
+
+  document.getElementById('q-topic').textContent = data.topic;
+  const imgEl=document.getElementById('q-image');
+  if(data.svg){imgEl.innerHTML=data.svg;imgEl.style.display='block';}else{imgEl.innerHTML='';imgEl.style.display='none';}
+  document.getElementById('q-text').textContent = data.q;
+  document.getElementById('q-explanation').style.display = 'none';
+  document.getElementById('next-btn').style.display      = 'none';
+
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  data.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => selectAnswer(i);
+    opts.appendChild(btn);
+  });
+}
+
+// ─── Handle answer selection ──────────────────────────────────
+function selectAnswer(chosen) {
+  const data    = activeQ[currentIdx];
+  const buttons = document.querySelectorAll('.option-btn');
+  answered++;
+
+  buttons.forEach(b => b.disabled = true);
+
+  if (chosen === data.ans) {
+    buttons[chosen].classList.add('correct');
+    correct++;
+  } else {
+    buttons[chosen].classList.add('wrong');
+    buttons[data.ans].classList.add('reveal');
+  }
+
+  const exp = document.getElementById('q-explanation');
+  exp.textContent = data.exp;
+  exp.style.display = 'block';
+
+  history.push({ data, chosen });
+  saveProgress();
+
+  document.getElementById('score-live').textContent = `Score: ${correct} / ${answered}`;
+  document.getElementById('next-btn').style.display = 'inline-block';
+
+  if (currentIdx === activeQ.length - 1) {
+    document.getElementById('next-btn').textContent = 'See Results';
+  } else {
+    document.getElementById('next-btn').textContent = 'Next Question';
+  }
+}
+
+// ─── Next question ────────────────────────────────────────────
+function nextQuestion() {
+  currentIdx++;
+  if (currentIdx >= activeQ.length) {
+    clearSave();
+    showResults();
+  } else {
+    saveProgress();
+    renderQuestion();
+  }
+}
+
+// ─── Show results ─────────────────────────────────────────────
+function showResults() {
+  document.getElementById('quiz-screen').style.display   = 'none';
+  document.getElementById('result-screen').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  const pct  = Math.round(correct / activeQ.length * 100);
+  const pass = pct >= 90;
+
+  document.getElementById('res-pct').textContent     = pct + '%';
+  document.getElementById('res-correct').textContent = correct;
+  document.getElementById('res-wrong').textContent   = activeQ.length - correct;
+  document.getElementById('res-total').textContent   = activeQ.length;
+
+  const pl = document.getElementById('res-pass');
+  pl.textContent  = pass ? 'PASS' : 'FAIL';
+  pl.className    = 'pass-label ' + (pass ? 'pass' : 'fail');
+}
+
+// ─── End quiz mid-way ─────────────────────────────────────────
+function endQuiz() {
+  if (answered > 0) {
+    showResults();
+  } else {
+    startNew();
+  }
+}
+
+// ─── New quiz ─────────────────────────────────────────────────
+function startNew() {
+  document.getElementById('result-screen').style.display  = 'none';
+  document.getElementById('review-section').style.display = 'none';
+  document.getElementById('start-screen').style.display   = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── Review ───────────────────────────────────────────────────
+function showReview() {
+  document.getElementById('review-section').style.display = 'block';
+  const list = document.getElementById('review-list');
+  list.innerHTML = '';
+  const letters = ['A','B','C','D'];
+
+  history.forEach(({ data, chosen }, idx) => {
+    const div = document.createElement('div');
+    div.className = 'review-item';
+
+    let optsHtml = data.opts.map((opt, i) => {
+      let cls = '';
+      if (i === data.ans) cls = 'rc';
+      else if (i === chosen && chosen !== data.ans) cls = 'rw';
+      const mark = i === data.ans ? '✓' : (i === chosen ? '✗' : '');
+      return `<div class="r-opt ${cls}">${letters[i]}. ${opt} ${mark}</div>`;
+    }).join('');
+
+    div.innerHTML = `
+      <div class="r-q">Q${idx+1}. ${data.q}</div>
+      ${optsHtml}
+      <div class="r-exp">${data.exp}</div>`;
+    list.appendChild(div);
+  });
+
+  document.getElementById('review-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+function hideReview() {
+  document.getElementById('review-section').style.display = 'none';
+}
+
+// ─── Utility ──────────────────────────────────────────────────
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SAVE / RESUME  (localStorage)
+// ═══════════════════════════════════════════════════════════════
+const SAVE_KEY = 'btt_quiz_v1';
+
+function saveProgress() {
+  try {
+    // Store question indices (not full objects, to keep size small)
+    const qIndices = activeQ.map(q => QUESTIONS.indexOf(q));
+    const histSave = history.map(({data, chosen}) => ({
+      qi: QUESTIONS.indexOf(data), ch: chosen
+    }));
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      qi: qIndices, ci: currentIdx, co: correct, an: answered,
+      hi: histSave, ts: Date.now()
+    }));
+  } catch(e) { /* storage full or disabled */ }
+}
+
+function loadSave() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+function clearSave() {
+  localStorage.removeItem(SAVE_KEY);
+}
+
+function discardSave() {
+  clearSave();
+  document.getElementById('resume-banner').style.display = 'none';
+}
+
+function resumeQuiz() {
+  const s = loadSave();
+  if (!s) return;
+  activeQ    = s.qi.map(i => QUESTIONS[i]).filter(Boolean);
+  currentIdx = s.ci;
+  correct    = s.co;
+  answered   = s.an;
+  history    = s.hi.map(({qi, ch}) => ({ data: QUESTIONS[qi], chosen: ch })).filter(h => h.data);
+  if (!activeQ.length) { discardSave(); return; }
+  document.getElementById('start-screen').style.display  = 'none';
+  document.getElementById('quiz-screen').style.display   = 'block';
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('review-section').style.display= 'none';
+  renderQuestion();
+}
+
+function checkResumeBanner() {
+  const s = loadSave();
+  if (!s || !s.qi || !s.qi.length) return;
+  const total = s.qi.length;
+  const done  = s.an;
+  const ago   = Math.round((Date.now() - s.ts) / 60000);
+  const agoTxt = ago < 60 ? ago + ' min ago' : Math.round(ago/60) + ' hr ago';
+  document.getElementById('resume-info').textContent =
+    `Question ${s.ci + 1} of ${total} • ${done} answered • saved ${agoTxt}`;
+  document.getElementById('resume-banner').style.display = 'block';
+}
+
+// Check for saved session when page loads
+checkResumeBanner();
+
+</script>
+</body>
+</html>
